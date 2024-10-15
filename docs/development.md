@@ -1,22 +1,3 @@
-
-# ramanalysis
-
-This repo contains a Python package called `ramanalysis`.
-
-[DESCRIPTION OF WHAT THE PACKAGE DOES].
-
-## Installation
-
-The package is hosted on PyPI and can be installed using pip:
-
-```bash
-pip install ramanalysis
-```
-
-## Usage
-
-[DOCUMENTATION ABOUT HOW TO USE THE PACKAGE]
-
 ## Development
 
 ### Environment setup

@@ -1,21 +1,35 @@
-# Python package template
+# ramanalysis
 
-This repo is a template for Python packages. It uses `poetry` for dependency management and packaging, `ruff` for formatting, `pyright` for type-checking, `pytest` for testing, and sphinx for documentation.
+This repo contains a Python package called `ramanalysis`, the main purpose of which is to facilitate processing Raman spectroscopy data.
+
+<!-- Currently, this package supports loading spectral data from two different Raman spectrometers:
+- [OpenRAMAN](https://www.open-raman.org/)
+- [Horiba MacroRam](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/macroramtm-805/) -->
+
+
+## Installation
+
+<!-- Hopefully possible in the near future...
+The package is hosted on PyPI and can be installed using pip:
+
+```bash
+pip install ramanalysis
+``` -->
+
+Clone the repository and install via pip:
+```bash
+git clone https://github.com/Arcadia-Science/ramanalysis.git
+cd ramanalysis
+pip install -e .
+```
+
 
 ## Usage
 
-1. Create a new repo using this template on GitHub by clicking the "Use this template" button at the top of the page.
+[DOCUMENTATION ABOUT HOW TO USE THE PACKAGE]
 
-1. Clone the new repo and replace the placeholders from the template with the appropriate values for your new project. All placeholders are in all caps and are delimited by square brackets. To find all of the placeholders, you can use the following command:
 
-    ```bash
-    git grep "\[[A-Z _-]\{2,\}\]"
-    ```
+## Contributing
 
-    Alternatively, in VS Code, you can use the "Find in Files" feature with the following regex pattern: `\[([A-Z _-]{2,})\]`.
-
-1. Follow the instructions in the `README_TEMPLATE.md` file to set up a development environment.
-
-1. Enable the GitHub Actions workflow that runs the tests by opening `.github/workflows/test.yml` and deleting the line `if: false`.
-
-1. Finally, delete this `README.md` file and rename the `README_TEMPLATE.md` file to `README.md`.
+If you are interested in contributing to this package, please check out the [developer notes](docs/development.md).
+See how we recognize [feedback and contributions to our code](https://github.com/Arcadia-Science/arcadia-software-handbook/blob/main/guides-and-standards/guide-credit-for-contributions.md).

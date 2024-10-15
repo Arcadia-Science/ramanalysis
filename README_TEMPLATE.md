@@ -1,7 +1,7 @@
 
-# [PACKAGE-NAME]
+# ramanalysis
 
-This repo contains a Python package called `[PACKAGE_NAME]`.
+This repo contains a Python package called `ramanalysis`.
 
 [DESCRIPTION OF WHAT THE PACKAGE DOES].
 
@@ -10,7 +10,7 @@ This repo contains a Python package called `[PACKAGE_NAME]`.
 The package is hosted on PyPI and can be installed using pip:
 
 ```bash
-pip install [PACKAGE-NAME]
+pip install ramanalysis
 ```
 
 ## Usage
@@ -24,8 +24,8 @@ pip install [PACKAGE-NAME]
 We use poetry for dependency management and build tooling. You can either install poetry globally or within a virtual environment in order to isolate poetry itself. We recommend the latter. First, create a new conda environment from the `dev.yml` environment file:
 
 ```bash
-conda env create -n [PACKAGE-NAME]-dev -f envs/dev.yml
-conda activate [PACKAGE-NAME]-dev
+conda env create -n ramanalysis-dev -f envs/dev.yml
+conda activate ramanalysis-dev
 ```
 
 Next, install dependencies, including the development, documentation, and build dependencies:
@@ -80,7 +80,7 @@ make pre-commit
 
 ### Testing
 
-We use `pytest` for testing. The tests are found in the `[PACKAGE_NAME]/tests/` subpackage. To run the tests, use the following command:
+We use `pytest` for testing. The tests are found in the `ramanalysis/tests/` subpackage. To run the tests, use the following command:
 
 ```bash
 make test
@@ -178,9 +178,9 @@ make build
 
 You should see an output that looks like this:
 ```
-Building [PACKAGE-NAME] (0.1.0)
+Building ramanalysis (0.1.0)
   - Building sdist
-  - Built [PACKAGE-NAME]-0.1.0.tar.gz
+  - Built ramanalysis-0.1.0.tar.gz
   - Building wheel
 ```
 
@@ -205,7 +205,7 @@ The `build-and-test-publish` command calls `poetry build` to build the package a
 Check that you can install the new version of the package from the test server:
 
 ```bash
-pip install --index-url https://test.pypi.org/simple/ [PACKAGE-NAME]==0.1.0
+pip install --index-url https://test.pypi.org/simple/ ramanalysis==0.1.0
 ```
 
 If everything looks good, build and publish the package to the prod PyPI server:
@@ -217,5 +217,5 @@ make build-and-publish
 Finally, check that you can install the new version of the package from the prod PyPI server:
 
 ```bash
-pip install [PACKAGE-NAME]==0.1.0
+pip install ramanalysis==0.1.0
 ```

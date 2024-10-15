@@ -1,5 +1,5 @@
 <!--
-Many thanks for contributing to Arcadia-Science/[PACKAGE-NAME]! 🎉
+Many thanks for contributing to Arcadia-Science/ramanalysis! 🎉
 
 Please fill in the checklist below. Delete any items that are not applicable.
 -->

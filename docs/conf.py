@@ -108,7 +108,7 @@ autoclass_content = "class"
 
 autoapi_type = "python"
 autoapi_dirs = ["../ramanalysis"]
-autoapi_options = []
+# autoapi_options = []  # currently bugged: https://github.com/readthedocs/sphinx-autoapi/issues/448
 autoapi_keep_files = True
 
 autoapi_ignore = [

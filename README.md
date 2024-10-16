@@ -26,7 +26,22 @@ pip install -e .
 
 ## Usage
 
-[DOCUMENTATION ABOUT HOW TO USE THE PACKAGE]
+Read an OpenRAMAN CSV file.
+```python
+from ramanalysis import RamanSpectrum
+
+example_data_directory = Path("../../ramanalysis/tests/example_data")
+
+csv_filepath_sample = next(example_data_directory.glob("*CC-125*.csv"))
+csv_filepath_excitation_calibration = next(example_data_directory.glob("*neon*.csv"))
+csv_filepath_emission_calibration = next(example_data_directory.glob("*aceto*.csv"))
+
+spectrum = RamanSpectrum.from_openraman_csvfiles(
+    csv_filepath_sample,
+    csv_filepath_excitation_calibration,
+    csv_filepath_emission_calibration,
+)
+```
 
 
 ## Contributing

@@ -42,6 +42,7 @@ scipy = "^1.14.1"
 pandas = "^2.2.3"
 pandas-stubs = "^2.2.3.241009"
 natsort = "^8.4.0"
+matplotlib = "^3.9.2"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "3.5.0"

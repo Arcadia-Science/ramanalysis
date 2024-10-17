@@ -221,7 +221,7 @@ class _RamanDataCalibrator:
         # wavenumbers_cm1 = self.calibrate_fine_with_refined_peaks(wavenumbers_cm1_rough)
         return wavenumbers_cm1
 
-    def calibrate_rough(self) -> NDArray[np.float64]:
+    def calibrate_rough(self) -> FloatArray:
         """Perform the rough calibration procedure."""
         reference_peaks_nm = NEON_PEAKS_NM
         detected_peaks_idx = find_n_most_prominent_peaks(

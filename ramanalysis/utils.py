@@ -59,23 +59,6 @@ def rescale_axis_via_least_squares_fit(
             desired values after rescaling.
         degree:
             The degree of the polynomial used for fitting. Default is 1 (linear transformation).
-
-    Examples:
-        Perform the first part of the rough calibration procedure which rescales an axis of
-        integers corresponding to the number of pixels in one dimension of the camera to
-        the spectral range of the Neon light source in nanometers.
-
-        >>> from ramanalysis.load_spectra import read_openraman_csv
-        >>> from ramanalysis.calibration import find_n_most_prominent_peaks, NEON_PEAKS_NM
-        >>> pixelated_axis = np.arange(2048)
-        >>> excitation_intensities = read_openraman_csv("/path/to/excitation_spectrum.csv")
-        >>> detected_peaks = find_n_most_prominent_peaks(
-            excitation_intensities,
-            num_peaks=NEON_PEAKS_NM.size,
-        )
-        >>> rescale_axis_via_least_squares_fit(pixelated_axis, detected_peaks, NEON_PEAKS_NM)[0]
-        array([543.73052774, 543.78567712, 543.84082651, ..., 656.51102082,
-               656.5661702 , 656.62131959])
     """
     polynomial, fitness = Polynomial.fit(  # type: ignore
         x_values_observed, x_values_groundtruth, deg=degree, full=True

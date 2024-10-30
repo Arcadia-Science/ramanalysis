@@ -81,7 +81,7 @@ def find_n_most_prominent_peaks(
     else:
         while (num_peaks_found > num_peaks) and (i < max_iterations):
             peaks, _ = find_peaks(signal, prominence=prominence)
-            num_peaks_found = int(peaks.size) # type: ignore
+            num_peaks_found = int(peaks.size)  # type: ignore
             prominence += prominence_increment
             i += 1
 

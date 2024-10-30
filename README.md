@@ -1,6 +1,6 @@
 # ramanalysis
 
-This repo contains a Python package called `ramanalysis`, the main purpose of which is to facilitate processing Raman spectroscopy data.
+This repository contains a Python package called `ramanalysis`, the main purpose of which is to facilitate reading Raman spectroscopy data from a variety of instruments by unifying the way the spectral data is loaded.
 
 <!-- Currently, this package supports loading spectral data from two different Raman spectrometers:
 - [OpenRAMAN](https://www.open-raman.org/)
@@ -26,22 +26,40 @@ pip install -e .
 
 ## Usage
 
-Read an OpenRAMAN CSV file.
+Read and calibrate spectral data from an OpenRAMAN CSV file.
 ```python
 from ramanalysis import RamanSpectrum
 
+# Set file paths to the CSV files for your sample and calibration data
 example_data_directory = Path("../../ramanalysis/tests/example_data")
-
 csv_filepath_sample = next(example_data_directory.glob("*CC-125*.csv"))
 csv_filepath_excitation_calibration = next(example_data_directory.glob("*neon*.csv"))
 csv_filepath_emission_calibration = next(example_data_directory.glob("*aceto*.csv"))
 
+# Read and calibrate the spectral data from your sample
 spectrum = RamanSpectrum.from_openraman_csvfiles(
     csv_filepath_sample,
     csv_filepath_excitation_calibration,
     csv_filepath_emission_calibration,
 )
 ```
+
+See [examples](examples/) for more example usage.
+
+
+## Roadmap
+1. Add a reader for CRS data from Leica LIF files.
+2. Integrate with [`RamanSPy`](https://ramanspy.readthedocs.io/en/latest/index.html) to easily convert `RamanSpectrum` instances to `ramanspy` `Spectrum` or `SpectralImage` instances and vice versa. Would look something like this:
+   ```python
+   spectrum = RamanSpectrum.from_openraman_csvfiles(
+        csv_filepath_sample,
+        csv_filepath_excitation_calibration,
+        csv_filepath_emission_calibration,
+    )
+
+   ramanspy_spectrum = spectrum.to_ramanspy_spectrum()
+   ramanalysis_spectrum = RamanSpectrum.from_ramanspy_spectrum(ramanspy_spectrum)
+   ```
 
 
 ## Contributing

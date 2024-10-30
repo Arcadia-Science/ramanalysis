@@ -13,28 +13,6 @@ IntArray = NDArray[np.int32]
 ScalarArray = FloatArray | IntArray
 
 
-NEON_PEAKS_NM: ScalarArray = np.array(
-    [
-        585.249,
-        588.189,
-        594.483,
-        607.434,
-        609.616,
-        614.306,
-        616.359,
-        621.728,
-        626.649,
-        630.479,
-        633.443,
-        638.299,
-        640.225,
-        650.653,
-        653.288,
-    ]
-)
-ACETONITRILE_PEAKS_CM1: ScalarArray = np.array([918, 1376, 2249, 2942, 2999])
-
-
 def gaussian(x: ScalarArray, amplitude: float, mean: float, stddev: float) -> FloatArray:
     """1D Gaussian distribution."""
     return amplitude * np.exp(-((x - mean) ** 2) / (2 * stddev**2))
@@ -124,18 +102,3 @@ def find_n_most_prominent_peaks(
             pass
 
     return np.array(peaks)
-
-
-def calculate_raman_shift(
-    emission_wavelengths_nm: FloatArray,
-    excitation_wavelength_nm: float = 532,
-) -> FloatArray:
-    """Calculate the Raman shift (cm^-1) for a range of wavelengths (nm).
-
-    The Raman shift corresponds to the energy difference between vibrational or rotational energy
-    levels in the molecules of a sample. It is calculated as the difference in wavenumber (cm^-1)
-    between an incident light source (usually a laser) and the Raman-scattered light emitted from
-    the sample.
-    """
-    raman_shift = (1 / excitation_wavelength_nm - 1 / emission_wavelengths_nm) * 1e7
-    return raman_shift

@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 import numpy as np
-from numpy.polynomial import Polynomial
+from numpy.polynomial import Legendre, Polynomial
 from numpy.typing import NDArray
 
 logger = logging.getLogger(__name__)
@@ -40,6 +40,7 @@ def rescale_axis_via_least_squares_fit(
     x_range: ScalarArray,
     x_values_observed: ScalarArray,
     x_values_groundtruth: ScalarArray,
+    polynomial: str = "legendre",
     degree: int = 1,
 ) -> tuple[FloatArray, list]:
     """Rescales an axis by fitting a polynomial transformation to two sets of points.
@@ -60,9 +61,14 @@ def rescale_axis_via_least_squares_fit(
         degree:
             The degree of the polynomial used for fitting. Default is 1 (linear transformation).
     """
-    polynomial, fitness = Polynomial.fit(  # type: ignore
-        x_values_observed, x_values_groundtruth, deg=degree, full=True
-    )
+    if polynomial.lower().startswith("poly"):
+        polynomial, fitness = Polynomial.fit(  # type: ignore
+            x_values_observed, x_values_groundtruth, deg=degree, full=True
+        )
+    else:
+        polynomial, fitness = Legendre.fit(  # type: ignore
+            x_values_observed, x_values_groundtruth, deg=degree, full=True
+        )
     return polynomial(x_range), fitness  # type: ignore
 
 

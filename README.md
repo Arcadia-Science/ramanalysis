@@ -1,10 +1,18 @@
 # ramanalysis
 
 This repository contains a Python package called `ramanalysis`, the main purpose of which is to facilitate reading Raman spectroscopy data from a variety of instruments by unifying the way the spectral data is loaded.
-
-<!-- Currently, this package supports loading spectral data from two different Raman spectrometers:
+This package currently supports loading spectral data from two different Raman spectrometers:
 - [OpenRAMAN](https://www.open-raman.org/)
-- [Horiba MacroRam](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/macroramtm-805/) -->
+- [Horiba MacroRam](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/macroramtm-805/)
+
+The most useful thing this package does is facilitate the calibration of spectral data output by the OpenRAMAN. The calibration procedure consists of two steps:
+1. A rough calibration based on a broadband excitation light source (e.g. Neon lamp)
+2. A fine calibration based on Raman-scattered light from a standard sample
+   (e.g. acetonitrile)
+
+Both calibration steps can be run automatically when spectra of neon and acetonitrile are provided (see [Usage](usage)).
+
+This automated procedure builds upon the [calibration procedure](https://github.com/Arcadia-Science/2024-open-raman-analysis/blob/calibration/notebooks/0_generate_calibration.ipynb) implemented by [@sunandascript](https://github.com/sunandascript). For more information on the calibration procedure, see this [blog post](https://www.open-raman.org/robust-calibration-method-for-spectrometers/) by the creator of the OpenRAMAN.
 
 
 ## Installation
@@ -28,6 +36,7 @@ pip install -e .
 
 Read and calibrate spectral data from an OpenRAMAN CSV file.
 ```python
+from pathlib import Path
 from ramanalysis import RamanSpectrum
 
 # Set file paths to the CSV files for your sample and calibration data

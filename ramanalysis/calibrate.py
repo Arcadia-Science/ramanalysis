@@ -46,7 +46,7 @@ ACETONITRILE_PEAKS_CM1: ScalarArray = np.array([918, 1376, 2249, 2942, 2999])
 
 
 class _OpenRamanDataProcessor:
-    """"""
+    """Processes spectral data from the OpenRAMAN spectrometer."""
 
     def __init__(
         self,
@@ -67,13 +67,12 @@ class _OpenRamanDataProcessor:
         self.fine_calibration_residuals_threshold = fine_calibration_residuals_threshold
 
     def process(self) -> tuple[FloatArray, FloatArray]:
-        """"""
+        """Read the intensities from the CSV file and run the calibration procedure."""
         intensities = read_openraman_csv(self.csv_filepath)
         wavenumbers_cm1 = self.calibrate()
         return wavenumbers_cm1, intensities
 
     def calibrate(self) -> FloatArray:
-        """"""
         wavenumbers_cm1 = _OpenRamanDataCalibrator(
             self.csv_filepath_excitation_calibration,
             self.csv_filepath_emission_calibration,
@@ -95,7 +94,11 @@ class _OpenRamanDataCalibrator:
 
     High-level batch testing did not reveal that spectra were calibrated with higher accuracy by
     refining peak positions, as measured by the differences in calculated vs expected peak
-    wavenumbers in the acetonitrile reference spectrum.
+    wavenumbers in the acetonitrile reference spectrum. The `calibrate` method therefore does not
+    call `calibrate_fine_with_refined_peaks`.
+
+    See also:
+        - https://www.open-raman.org/robust-calibration-method-for-spectrometers/
     """
 
     def __init__(

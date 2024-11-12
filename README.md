@@ -48,7 +48,7 @@ See [examples](examples/) for more example usage.
 
 
 ## Roadmap
-1. Add a reader for CRS data from Leica LIF files.
+1. Add a reader for CRS data from Leica LIF files using [`readlif`](https://github.com/Arcadia-Science/readlif).
 2. Integrate with [`RamanSPy`](https://ramanspy.readthedocs.io/en/latest/index.html) to easily convert `RamanSpectrum` instances to `ramanspy` `Spectrum` or `SpectralImage` instances and vice versa. Would look something like this:
    ```python
    spectrum = RamanSpectrum.from_openraman_csvfiles(

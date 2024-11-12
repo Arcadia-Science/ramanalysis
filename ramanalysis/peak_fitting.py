@@ -46,7 +46,9 @@ def refine_peak_parabolic_fit(int_peak_index: int, signal: FloatArray) -> float:
     """Refine an estimated peak position in a 1D signal by a parabolic fit.
 
     Uses the formula
+
         i_peak = i + (y_{i-1} - y_{i+1}) / (2 * (y_{i-1} - 2y_i + y_{i+1}))
+
     where y_{i-1}, y_i, and y_{i+1} are the values of the signal at indices i-1, i, and i+1.
     Assuming the peak is roughly centered around i, the parabola is fit around these three points.
 
@@ -86,6 +88,9 @@ def refine_peaks(
         peaks: Integer indices of peak positions in the signal.
         signal: Input one-dimensional signal with which to refine the peak positions.
         method: Whether to refine peaks by fitting a Gaussian distribution or a parabola.
+
+    Returns:
+        refined_peaks: Array of indices (as floats) of refined peak positions.
     """
     if method.lower().startswith("gauss"):
         refine_peak = refine_peak_gaussian_fit

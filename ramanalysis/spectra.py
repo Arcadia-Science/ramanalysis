@@ -25,7 +25,7 @@ ScalarArray = FloatArray | IntArray
 
 @dataclass(frozen=True)
 class RamanSpectrum:
-    """"""
+    """A dataclass for Raman spectroscopy data."""
 
     wavenumbers_cm1: FloatArray
     intensities: FloatArray
@@ -39,7 +39,7 @@ class RamanSpectrum:
         excitation_wavelength_nm: float = 532,
         kernel_size: int = 5,
         rough_calibration_residuals_threshold: float = 1.0,
-        fine_calibration_residuals_threshold: float = 1e6,
+        fine_calibration_residuals_threshold: float = 1e2,
     ) -> RamanSpectrum:
         """Load the calibrated Raman spectrum from a CSV file output by the OpenRAMAN spectrometer.
 
@@ -83,7 +83,7 @@ class RamanSpectrum:
         return -1
 
     def between(self, min_wavenumber_cm1: float, max_wavenumber_cm1: float) -> RamanSpectrum:
-        """"""
+        """Clip spectrum to a specified spectral range."""
         wavenumbers_cm1 = self.wavenumbers_cm1[
             (self.wavenumbers_cm1 > min_wavenumber_cm1)
             & (self.wavenumbers_cm1 < max_wavenumber_cm1)
@@ -95,14 +95,14 @@ class RamanSpectrum:
         return RamanSpectrum(wavenumbers_cm1, intensities)
 
     def normalize(self) -> RamanSpectrum:
-        """"""
+        """Normalize intensities with min-max normalization."""
         normalized_intensities = (self.intensities - self.intensities.min()) / (
             self.intensities.max() - self.intensities.min()
         )
         return RamanSpectrum(self.wavenumbers_cm1, normalized_intensities)
 
     def smooth(self, kernel_size: int = 5) -> RamanSpectrum:
-        """"""
+        """Smooth intensities with median filtering."""
         smoothed_intensities = medfilt(self.intensities, kernel_size=kernel_size)
         return RamanSpectrum(self.wavenumbers_cm1, smoothed_intensities)
 
@@ -112,21 +112,28 @@ class RamanSpectrum:
         prominence_increment: float = 0.005,
         max_iterations: int = 500,
     ) -> FloatArray:
-        """"""
+        """Find the specified number of peaks and return the corresponding wavenumbers."""
         peak_indices = find_n_most_prominent_peaks(
-            self.normalize().intensities, num_peaks, prominence_increment, max_iterations
+            self.intensities,
+            num_peaks,
+            prominence_increment,
+            max_iterations,
         )
         return self.wavenumbers_cm1[peak_indices]
 
     def find_prominent_wavenumbers(self, prominence: float = 0.01, **kwargs) -> FloatArray:
-        """"""
-        peak_indices = find_peaks(self.intensities, prominence=prominence, **kwargs)
+        """Find prominent peaks and return the corresponding wavenumbers."""
+        peak_indices = find_peaks(
+            self.intensities,
+            prominence=prominence,
+            **kwargs,
+        )
         return self.wavenumbers_cm1[peak_indices]  # type: ignore
 
 
 @dataclass
 class RamanSpectra:
-    """"""
+    """A dataclass for a collection of Raman spectroscopy data."""
 
     spectra: dict[str, RamanSpectrum]
 
@@ -140,9 +147,14 @@ class RamanSpectra:
         excitation_wavelength_nm: float = 532,
         kernel_size: int = 5,
         rough_calibration_residuals_threshold: float = 1.0,
-        fine_calibration_residuals_threshold: float = 1e6,
+        fine_calibration_residuals_threshold: float = 1e2,
     ) -> RamanSpectra:
-        """"""
+        """Load spectra from a directory of OpenRAMAN data.
+
+        TODO: This is "dirty" because of its reliance on glob string expressions. A better option
+        might be to load from a datasheet that specifies all the sample filenames and calibration
+        data file paths.
+        """
 
         csv_filepaths_samples = natsorted(Path(filepath).glob(sample_glob_str))
         csv_filepath_excitation_calibration = next(Path(filepath).glob(excitation_glob_str))

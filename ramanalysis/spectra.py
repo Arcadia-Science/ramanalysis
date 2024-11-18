@@ -83,15 +83,11 @@ class RamanSpectrum:
 
     def between(self, min_wavenumber_cm1: float, max_wavenumber_cm1: float) -> RamanSpectrum:
         """Clip spectrum to a specified spectral range."""
-        wavenumbers_cm1 = self.wavenumbers_cm1[
-            (self.wavenumbers_cm1 > min_wavenumber_cm1)
-            & (self.wavenumbers_cm1 < max_wavenumber_cm1)
-        ]
-        intensities = self.intensities[
-            (self.wavenumbers_cm1 > min_wavenumber_cm1)
-            & (self.wavenumbers_cm1 < max_wavenumber_cm1)
-        ]
-        return RamanSpectrum(wavenumbers_cm1, intensities)
+
+        mask = (self.wavenumbers_cm1 > min_wavenumber_cm1) & (
+            self.wavenumbers_cm1 < max_wavenumber_cm1
+        )
+        return RamanSpectrum(self.wavenumbers_cm1[mask], self.intensities[mask])
 
     def normalize(self) -> RamanSpectrum:
         """Normalize intensities with min-max normalization."""

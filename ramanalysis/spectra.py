@@ -79,8 +79,7 @@ class RamanSpectrum:
 
     @property
     def snr(self) -> float:
-        # TODO: add SNR calculation
-        return -1
+        raise NotImplementedError("TODO: SNR calculation hasn't been implemented.")
 
     def between(self, min_wavenumber_cm1: float, max_wavenumber_cm1: float) -> RamanSpectrum:
         """Clip spectrum to a specified spectral range."""

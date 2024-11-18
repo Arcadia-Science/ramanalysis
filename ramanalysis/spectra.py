@@ -3,9 +3,7 @@ import logging
 from dataclasses import dataclass
 from pathlib import Path
 
-import numpy as np
 from natsort import natsorted
-from numpy.typing import NDArray
 from scipy.signal import find_peaks, medfilt
 
 from .calibrate import _OpenRamanDataCalibrator, _OpenRamanDataProcessor
@@ -14,13 +12,9 @@ from .readers import (
     read_horiba_txt,
     read_openraman_csv,
 )
+from .typing import FloatArray
 
 logger = logging.getLogger(__name__)
-
-# type aliases
-FloatArray = NDArray[np.float64]
-IntArray = NDArray[np.int32]
-ScalarArray = FloatArray | IntArray
 
 
 @dataclass(frozen=True)

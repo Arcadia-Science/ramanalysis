@@ -1,16 +1,11 @@
 import logging
 from pathlib import Path
 
-import numpy as np
 from numpy.polynomial import Polynomial
-from numpy.typing import NDArray
+
+from .typing import FloatArray, ScalarArray
 
 logger = logging.getLogger(__name__)
-
-# type aliases
-FloatArray = NDArray[np.float64]
-IntArray = NDArray[np.int32]
-ScalarArray = FloatArray | IntArray
 
 
 def interpolate_between_two_values(

@@ -1,16 +1,12 @@
 import logging
 
 import numpy as np
-from numpy.typing import NDArray
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 
-logger = logging.getLogger(__name__)
+from .typing import FloatArray, IntArray, ScalarArray
 
-# type aliases
-FloatArray = NDArray[np.float64]
-IntArray = NDArray[np.int32]
-ScalarArray = FloatArray | IntArray
+logger = logging.getLogger(__name__)
 
 
 def gaussian(x: ScalarArray, amplitude: float, mean: float, stddev: float) -> FloatArray:

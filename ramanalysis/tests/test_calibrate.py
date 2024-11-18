@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from numpy.typing import NDArray
 
 from ramanalysis.calibrate import (
     ACETONITRILE_PEAKS_CM1,
@@ -8,11 +7,6 @@ from ramanalysis.calibrate import (
     calculate_raman_shift,
 )
 from ramanalysis.peak_fitting import find_n_most_prominent_peaks
-
-# type aliases
-FloatArray = NDArray[np.float64]
-IntArray = NDArray[np.int32]
-ScalarArray = FloatArray | IntArray
 
 # set tolerances for testing
 ROUGH_CALIBRATION_RESIDUALS_THRESHOLD = 1

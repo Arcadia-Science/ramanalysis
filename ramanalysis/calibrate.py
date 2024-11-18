@@ -3,7 +3,6 @@ import logging
 from pathlib import Path
 
 import numpy as np
-from numpy.typing import NDArray
 from scipy.signal import medfilt
 
 from .peak_fitting import (
@@ -11,17 +10,13 @@ from .peak_fitting import (
     refine_peaks,
 )
 from .readers import read_openraman_csv
+from .typing import FloatArray, ScalarArray
 from .utils import (
     interpolate_between_two_values,
     rescale_axis_via_least_squares_fit,
 )
 
 logger = logging.getLogger(__name__)
-
-# type aliases
-FloatArray = NDArray[np.float64]
-IntArray = NDArray[np.int32]
-ScalarArray = FloatArray | IntArray
 
 NEON_PEAKS_NM: ScalarArray = np.array(
     [

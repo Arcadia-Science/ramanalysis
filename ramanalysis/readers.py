@@ -4,14 +4,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from numpy.typing import NDArray
+
+from .typing import FloatArray
 
 logger = logging.getLogger(__name__)
-
-# type aliases
-FloatArray = NDArray[np.float64]
-IntArray = NDArray[np.int32]
-ScalarArray = FloatArray | IntArray
 
 
 def read_openraman_csv(csv_filepath: Path | str) -> FloatArray:

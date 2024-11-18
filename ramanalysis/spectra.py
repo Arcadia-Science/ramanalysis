@@ -85,9 +85,9 @@ class RamanSpectrum:
 
     def normalize(self) -> RamanSpectrum:
         """Normalize intensities with min-max normalization."""
-        normalized_intensities = (self.intensities - self.intensities.min()) / (
-            self.intensities.max() - self.intensities.min()
-        )
+        _min = self.intensities.min()
+        _max = self.intensities.max()
+        normalized_intensities = (self.intensities - _min) / (_max - _min)
         return RamanSpectrum(self.wavenumbers_cm1, normalized_intensities)
 
     def smooth(self, kernel_size: int = 5) -> RamanSpectrum:

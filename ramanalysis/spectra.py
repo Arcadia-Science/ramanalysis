@@ -111,7 +111,18 @@ class RamanSpectrum:
         return self.wavenumbers_cm1[peak_indices]
 
     def find_prominent_wavenumbers(self, prominence: float = 0.01, **kwargs) -> FloatArray:
-        """Find prominent peaks and return the corresponding wavenumbers."""
+        """Find prominent peaks and return the corresponding wavenumbers.
+
+        Args:
+            prominence:
+                Threshold for peak prominence, measured as the vertical distance between the peak
+                and its lowest surrounding contour line.
+            **kwargs:
+                Keyword arguments accepted by `scipy.signal.find_peaks`.
+
+        See also:
+            - https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html
+        """
         peak_indices = find_peaks(
             self.intensities,
             prominence=prominence,

@@ -53,7 +53,7 @@ spectrum = RamanSpectrum.from_openraman_csvfiles(
 )
 ```
 
-See [examples](examples/) for more example usage.
+See [examples](docs/examples/) for more example usage.
 
 
 ## Roadmap

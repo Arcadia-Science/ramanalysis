@@ -81,9 +81,13 @@ def refine_peaks(
     in simplicity and reliability.
 
     Args:
-        peaks: Integer indices of peak positions in the signal.
-        signal: Input one-dimensional signal with which to refine the peak positions.
-        method: Whether to refine peaks by fitting a Gaussian distribution or a parabola.
+        peaks:
+            Integer indices of peak positions in the signal.
+        signal:
+            Input one-dimensional signal with which to refine the peak positions.
+        method:
+            Whether to refine peaks by fitting a Gaussian distribution or a parabola. Must be
+            one of `parabolic` or `gaussian`. Default is `parabolic`.
 
     Returns:
         refined_peaks: Array of indices (as floats) of refined peak positions.

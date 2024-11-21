@@ -87,10 +87,10 @@ class _OpenRamanDataCalibrator:
         2) A fine calibration based on Raman-scattered light from a standard sample
            (e.g. acetonitrile)
 
-    High-level batch testing did not reveal that spectra were calibrated with higher accuracy by
+    Batch testing did not reveal that spectra were calibrated with higher accuracy by
     refining peak positions, as measured by the differences in calculated vs expected peak
-    wavenumbers in the acetonitrile reference spectrum. The `calibrate` method therefore does not
-    call `calibrate_fine_with_refined_peaks`.
+    wavenumbers in the acetonitrile reference spectrum. The `calibrate` method therefore uses
+    `calibrate_fine` by default as opposed to `calibrate_fine_with_refined_peaks`.
 
     See also:
         - https://www.open-raman.org/robust-calibration-method-for-spectrometers/

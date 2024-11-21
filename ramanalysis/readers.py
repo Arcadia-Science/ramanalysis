@@ -17,7 +17,7 @@ def read_openraman_csv(csv_filepath: Path | str) -> FloatArray:
     in a subsequent step using known reference values from a standard sample.
     """
     dataframe = pd.read_csv(csv_filepath)  # type: ignore
-    return np.array(dataframe["Intensity (a.u.)"].values)
+    return np.array(dataframe["Intensity (a.u.)"].values).astype(np.float64)
 
 
 def read_horiba_txt(txt_filepath: Path | str) -> tuple[FloatArray, FloatArray]:
@@ -35,6 +35,6 @@ def read_horiba_txt(txt_filepath: Path | str) -> tuple[FloatArray, FloatArray]:
         sep="\t",
         encoding="unicode_escape",
     )
-    wavenumbers_cm1 = np.array(dataframe["wavenumber_cm-1"].values)[::-1]
-    intensities = np.array(dataframe["intensity"].values)[::-1]
+    wavenumbers_cm1 = np.array(dataframe["wavenumber_cm-1"].values)[::-1].astype(np.float64)
+    intensities = np.array(dataframe["intensity"].values)[::-1].astype(np.float64)
     return wavenumbers_cm1, intensities

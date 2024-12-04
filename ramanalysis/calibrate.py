@@ -11,10 +11,7 @@ from .peak_fitting import (
 )
 from .readers import read_openraman_csv
 from .typing import FloatArray, ScalarArray
-from .utils import (
-    interpolate_between_two_values,
-    rescale_axis_via_least_squares_fit,
-)
+from .utils import rescale_axis_via_least_squares_fit
 
 logger = logging.getLogger(__name__)
 
@@ -198,28 +195,19 @@ class _OpenRamanDataCalibrator:
     def calibrate_fine_with_refined_peaks(
         self,
         wavenumbers_cm1_rough: FloatArray,
-        method: str = "parabolic",
     ) -> FloatArray:
         """Perform the fine calibration procedure with subpixel interpolation of peak positions."""
         reference_peaks_cm1 = ACETONITRILE_PEAKS_CM1
         detected_peaks_indices = find_n_most_prominent_peaks(
             self.emission_intensities, num_peaks=reference_peaks_cm1.size
         )
-        refined_peaks_float_indices = refine_peaks(
-            peaks=detected_peaks_indices,
-            signal=self.emission_intensities,
-            method=method,
-        )
-        # split float indices into integer and fraction components for interpolation
-        refined_peaks_int_indices = np.floor(refined_peaks_float_indices).astype(int)
-        refined_peaks_fractional_indices = refined_peaks_float_indices % 1
-        refined_peaks_cm1 = interpolate_between_two_values(
-            wavenumbers_cm1_rough[refined_peaks_int_indices],
-            wavenumbers_cm1_rough[refined_peaks_int_indices + 1],
-            refined_peaks_fractional_indices,
+        refined_peaks_cm1, _ = refine_peaks(
+            detected_peaks_indices,
+            self.emission_intensities,
+            wavenumbers_cm1_rough,
         )
         wavenumbers_cm1, fitness = rescale_axis_via_least_squares_fit(
-            wavenumbers_cm1_rough, np.array(refined_peaks_cm1), reference_peaks_cm1
+            wavenumbers_cm1_rough, refined_peaks_cm1, reference_peaks_cm1
         )
 
         # check that sum of squared residuals < specified threshold

@@ -102,7 +102,6 @@ def test_refine_peak_parabolic_fit_basic():
 
 def test_refine_peaks(get_spiky_sinusoidal):
     x_values, y_values, x_peaks, y_peaks = get_spiky_sinusoidal
-    #
     peak_indices = np.searchsorted(x_values, x_peaks)
     x_refined_peaks, y_refined_peaks = refine_peaks(peak_indices, y_values, x_values)
 

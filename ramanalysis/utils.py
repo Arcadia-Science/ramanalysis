@@ -8,29 +8,6 @@ from .typing import FloatArray, ScalarArray
 logger = logging.getLogger(__name__)
 
 
-def interpolate_between_two_values(
-    x0: int | float | ScalarArray,
-    x1: int | float | ScalarArray,
-    fraction: float | FloatArray,
-) -> float | FloatArray:
-    """Linear interpolation in one dimension between two points.
-
-    Formula for interpolating between two numbers `x0` and `x1` is
-        interpolated value = x0 * fraction + (x1 - x0)
-    where `fraction` is a value between 0 and 1 indicating the relative position between
-    `x0` and `x1`.
-
-    Examples:
-        >>> interpolate(5, 10, 0.5)
-        7.5
-        >>> x0_arr = np.array([3, 33, 333])
-        >>> x1_arr = np.array([4, 44, 444])
-        >>> interpolate(x0_arr, x1_arr, 0.1)
-        array([  3.1,  34.1, 344.1])
-    """
-    return x0 + fraction * (x1 - x0)
-
-
 def rescale_axis_via_least_squares_fit(
     x_range: ScalarArray,
     x_values_observed: ScalarArray,

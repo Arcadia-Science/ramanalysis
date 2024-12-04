@@ -1,7 +1,7 @@
 import logging
 
 import numpy as np
-from scipy.optimize import curve_fit
+from numpy.polynomial import Polynomial
 from scipy.signal import find_peaks
 
 from .typing import FloatArray, IntArray, ScalarArray
@@ -9,36 +9,11 @@ from .typing import FloatArray, IntArray, ScalarArray
 logger = logging.getLogger(__name__)
 
 
-def gaussian(x: ScalarArray, amplitude: float, mean: float, stddev: float) -> FloatArray:
-    """1D Gaussian distribution."""
-    return amplitude * np.exp(-((x - mean) ** 2) / (2 * stddev**2))
-
-
-def refine_peak_gaussian_fit(
-    int_peak_index: int, signal: FloatArray, window_size: int = 7
-) -> float:
-    """Refine an estimated peak position in a 1D signal by least-squares Gaussian fit.
-
-    Args:
-        int_peak_index: Integer index position of `signal` at which a peak is expected.
-        signal: Input one-dimensional signal with which to refine the peak position.
-        window_size: Window size around the peak for Gaussian fit.
-
-    Returns:
-        i_peak: subpixel-interpolated peak position.
-    """
-    i = int(int_peak_index)
-    x_window_start, x_window_end = (i - window_size // 2, i + window_size // 2)
-    x_window = np.arange(x_window_start, x_window_end)
-    initial_guesses = [1, i, 1]
-    fit_parameters, _covariance_matrix = curve_fit(
-        gaussian, xdata=x_window, ydata=signal[x_window], p0=initial_guesses
-    )
-    i_peak = fit_parameters[1]
-    return i_peak
-
-
-def refine_peak_parabolic_fit(int_peak_index: int, signal: FloatArray) -> float:
+def refine_peak_parabolic_fit(
+    i_peak: int,
+    y_values: FloatArray,
+    x_values: ScalarArray | None = None,
+) -> tuple[float, float]:
     """Refine an estimated peak position in a 1D signal by a parabolic fit.
 
     Uses the formula
@@ -49,63 +24,67 @@ def refine_peak_parabolic_fit(int_peak_index: int, signal: FloatArray) -> float:
     Assuming the peak is roughly centered around i, the parabola is fit around these three points.
 
     Args:
-        int_peak_index: Integer index position of `signal` at which a peak is expected.
-        signal: Input one-dimensional signal with which to refine the peak position.
+        i_peak: Integer index position of `y_values` at which a peak is expected.
+        y_values: Input one-dimensional signal with which to refine the peak position.
+        x_values: (Optional) input x values corresponding to the input one-dimensional signal.
 
     Returns:
-        i_peak: subpixel-interpolated peak position.
+        x_interpolated_peak: Interpolated peak position in x.
+        y_interpolated_peak: Interpolated peak position in y.
     """
-    # aliases to match the formula
-    i = int(int_peak_index)
-    y_left = signal[i - 1]
-    y_center = signal[i]
-    y_right = signal[i + 1]
-    # avoid division by 0
-    if y_left + y_right == 2 * y_center:
-        logger.warning("Peak position could not be refined.")
-        return i
-    # apply formula
-    i_peak = i + (y_left - y_right) / (2 * (y_left - 2 * y_center + y_right))
-    return i_peak
+    if x_values is None:
+        x_values = np.arange(y_values.size)
+
+    # small window around the peak (3 points: left, peak, right)
+    if 0 < i_peak < y_values.size - 1:
+        i_window = np.array([i_peak - 1, i_peak, i_peak + 1])
+        x_window = x_values[i_window]
+        y_window = y_values[i_window]
+    else:
+        msg = "Peak index is at the edge of the signal and therefore cannot be interpolated."
+        logger.warning(msg)
+        return x_values[i_peak], y_values[i_peak]
+
+    # fit parabola to 3 points
+    parabola = Polynomial.fit(  # type: ignore
+        x_window, y_window, deg=2
+    ).convert()
+    a, b, _c = parabola.coef[::-1]
+    x_interpolated_peak = -b / (2 * a)
+
+    # sometimes it does a really bad job \_0_/
+    if not x_window[0] < x_interpolated_peak < x_window[-1]:
+        msg = "Parabolic interpolation failed: Interpolated x position is out of bounds."
+        logger.warning(msg)
+        return x_values[i_peak], y_values[i_peak]
+
+    y_interpolated_peak = parabola(x_interpolated_peak)
+    return x_interpolated_peak, y_interpolated_peak
 
 
 def refine_peaks(
-    peaks: IntArray,
-    signal: FloatArray,
-    method: str = "parabolic",
-    **kwargs,
-) -> FloatArray:
-    """Applies :func:`refine_peak` to an arbitrary number of peaks.
-
-    Uses parabolic fitting by default as any decrease in accuracy is made up for by the increase
-    in simplicity and reliability.
+    i_peaks: IntArray,
+    y_values: FloatArray,
+    x_values: FloatArray | None = None,
+) -> tuple[FloatArray, FloatArray]:
+    """Applies :func:`refine_peak_parabolic_fit` to an arbitrary number of peaks.
 
     Args:
-        peaks:
-            Integer indices of peak positions in the signal.
-        signal:
-            Input one-dimensional signal with which to refine the peak positions.
-        method:
-            Whether to refine peaks by fitting a Gaussian distribution or a parabola. Must be
-            one of `parabolic` or `gaussian`. Default is `parabolic`.
+        i_peaks: Integer index positions of `y_values` at which peaks are expected.
+        y_values: Input one-dimensional signal with which to refine the peak positions.
+        x_values: (Optional) input x values corresponding to the input one-dimensional signal.
 
     Returns:
-        refined_peaks: Array of indices (as floats) of refined peak positions.
+        x_refined_peaks: Array of refined peak positions in x.
+        y_refined_peaks: Array of refined peak positions in y.
     """
-    if method.lower().startswith("gauss"):
-        refine_peak = refine_peak_gaussian_fit
-    elif method.lower().startswith("parabo"):
-        refine_peak = refine_peak_parabolic_fit
-    else:
-        raise ValueError(
-            "Invalid choice for peak refinement. Must be one of `gaussian` or `parabolic`."
-        )
-
-    refined_peaks: list[float] = []
-    for peak in peaks:
-        refined_peak = refine_peak(peak, signal, **kwargs)
-        refined_peaks.append(refined_peak)
-    return np.array(refined_peaks)
+    x_refined_peaks: list[float] = []
+    y_refined_peaks: list[float] = []
+    for i_peak in i_peaks:
+        x_refined_peak, y_refined_peak = refine_peak_parabolic_fit(i_peak, y_values, x_values)
+        x_refined_peaks.append(x_refined_peak)
+        y_refined_peaks.append(y_refined_peak)
+    return np.array(x_refined_peaks), np.array(y_refined_peaks)
 
 
 def find_n_most_prominent_peaks(

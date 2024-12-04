@@ -1,21 +1,77 @@
-# Python package template
+# ramanalysis
 
-This repo is a template for Python packages. It uses `poetry` for dependency management and packaging, `ruff` for formatting, `pyright` for type-checking, `pytest` for testing, and sphinx for documentation.
+This repository contains a Python package called `ramanalysis`, the main purpose of which is to facilitate reading Raman spectroscopy data from a variety of instruments by unifying the way the spectral data is loaded.
+This package currently supports loading spectral data from two different Raman spectrometers:
+- [OpenRAMAN](https://www.open-raman.org/)
+- [Horiba MacroRam](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/macroramtm-805/)
+
+The most useful thing this package does is facilitate the calibration of spectral data output by the OpenRAMAN. The calibration procedure consists of two steps:
+1. A rough calibration based on a broadband excitation light source (e.g. Neon lamp)
+2. A fine calibration based on Raman-scattered light from a standard sample
+   (e.g. acetonitrile)
+
+Both calibration steps can be run automatically when spectra of neon and acetonitrile are provided (see [Usage](usage)).
+
+This automated procedure builds upon the [calibration procedure](https://github.com/Arcadia-Science/2024-open-raman-analysis/blob/calibration/notebooks/0_generate_calibration.ipynb) implemented by [@sunandascript](https://github.com/sunandascript). For more information on the calibration procedure, see this [blog post](https://www.open-raman.org/robust-calibration-method-for-spectrometers/) by the creator of the OpenRAMAN.
+
+
+## Installation
+
+<!-- Hopefully possible in the near future...
+The package is hosted on PyPI and can be installed using pip:
+
+```bash
+pip install ramanalysis
+``` -->
+
+Clone the repository and install via pip:
+```bash
+git clone https://github.com/Arcadia-Science/ramanalysis.git
+cd ramanalysis
+pip install -e .
+```
+
 
 ## Usage
 
-1. Create a new repo using this template on GitHub by clicking the "Use this template" button at the top of the page.
+Read and calibrate spectral data from an OpenRAMAN CSV file.
+```python
+from pathlib import Path
+from ramanalysis import RamanSpectrum
 
-1. Clone the new repo and replace the placeholders from the template with the appropriate values for your new project. All placeholders are in all caps and are delimited by square brackets. To find all of the placeholders, you can use the following command:
+# Set file paths to the CSV files for your sample and calibration data
+example_data_directory = Path("ramanalysis/ramanalysis/tests/example_data/OpenRAMAN/")
+csv_filepath_sample = next(example_data_directory.glob("*CC-125*.csv"))
+csv_filepath_excitation_calibration = next(example_data_directory.glob("*neon*.csv"))
+csv_filepath_emission_calibration = next(example_data_directory.glob("*aceto*.csv"))
 
-    ```bash
-    git grep "\[[A-Z _-]\{2,\}\]"
-    ```
+# Read and calibrate the spectral data from your sample
+spectrum = RamanSpectrum.from_openraman_csvfiles(
+    csv_filepath_sample,
+    csv_filepath_excitation_calibration,
+    csv_filepath_emission_calibration,
+)
+```
 
-    Alternatively, in VS Code, you can use the "Find in Files" feature with the following regex pattern: `\[([A-Z _-]{2,})\]`.
+See [examples](docs/examples/) for more example usage.
 
-1. Follow the instructions in the `README_TEMPLATE.md` file to set up a development environment.
 
-1. Enable the GitHub Actions workflow that runs the tests by opening `.github/workflows/test.yml` and deleting the line `if: false`.
+## Roadmap
+1. Add a reader for CRS data from Leica LIF files using [`readlif`](https://github.com/Arcadia-Science/readlif).
+2. Integrate with [`RamanSPy`](https://ramanspy.readthedocs.io/en/latest/index.html) to easily convert `RamanSpectrum` instances to `ramanspy` `Spectrum` or `SpectralImage` instances and vice versa. Would look something like this:
+   ```python
+   spectrum = RamanSpectrum.from_openraman_csvfiles(
+        csv_filepath_sample,
+        csv_filepath_excitation_calibration,
+        csv_filepath_emission_calibration,
+    )
 
-1. Finally, delete this `README.md` file and rename the `README_TEMPLATE.md` file to `README.md`.
+   ramanspy_spectrum = spectrum.to_ramanspy_spectrum()
+   ramanalysis_spectrum = RamanSpectrum.from_ramanspy_spectrum(ramanspy_spectrum)
+   ```
+
+
+## Contributing
+
+If you are interested in contributing to this package, please check out the [developer notes](docs/development.md).
+See how we recognize [feedback and contributions to our code](https://github.com/Arcadia-Science/arcadia-software-handbook/blob/main/guides-and-standards/guide-credit-for-contributions.md).

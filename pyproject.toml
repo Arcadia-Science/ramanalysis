@@ -13,18 +13,18 @@ style = "pep440"
 dirty = true
 
 [tool.poetry]
-name = "[PACKAGE_NAME]"
+name = "ramanalysis"
 # This version is a placeholder. It will be updated at build time by poetry-dynamic-versioning
 # from the latest git tag.
 version = "0.0.0"
-description = "[DESCRIPTION OF THE PACKAGE]"
-authors = ["[FIRST] [LAST] <[EMAIL]>"]
+description = "Package for loading and processing spectral data from Arcadia's Raman spectroscopy instruments."
+authors = ["Ryan Lane <ryan.lane@arcadiascience.com>"]
 readme = "README.md"
 license = "MIT"
-packages = [{ include = "[PACKAGE_NAME]" }]
-homepage = "https://github.com/Arcadia-Science/[PACKAGE-NAME]"
-repository = "https://github.com/Arcadia-Science/[PACKAGE-NAME]"
-documentation = "https://github.com/Arcadia-Science/[PACKAGE-NAME]/blob/main/README.md"
+packages = [{ include = "ramanalysis" }]
+homepage = "https://github.com/Arcadia-Science/ramanalysis"
+repository = "https://github.com/Arcadia-Science/ramanalysis"
+documentation = "https://github.com/Arcadia-Science/ramanalysis/blob/main/README.md"
 
 [[tool.poetry.source]]
 name = "pypi"
@@ -36,7 +36,14 @@ name = "pypi_test"
 url = "https://test.pypi.org/legacy/"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.10,<4.0"
+numpy = "^2.1.2"
+scipy = "^1.14.1"
+pandas = "^2.2.3"
+pandas-stubs = "^2.2.3.241009"
+natsort = "^8.4.0"
+matplotlib = "^3.9.2"
+ramanspy = "^0.2.10"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "3.5.0"

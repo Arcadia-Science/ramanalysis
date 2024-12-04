@@ -149,7 +149,7 @@ def test_fine_calibration_batch_succeeds(
         )
 
 
-def test_fine_calibration_with_refined_peaks_succeeds(
+def test_fine_calibration_with_refined_peaks_batch_succeeds(
     batch_neon_spectra_csv_filepaths,
     batch_acetonitrile_spectra_csv_filepaths,
 ):
@@ -172,9 +172,7 @@ def test_fine_calibration_with_refined_peaks_succeeds(
             fine_calibration_residuals_threshold=FINE_CALIBRATION_RESIDUALS_THRESHOLD,
         )
         wavenumbers_cm1_rough = calibrator.calibrate_rough()
-        wavenumbers_cm1 = calibrator.calibrate_fine_with_refined_peaks(
-            wavenumbers_cm1_rough, method="parabolic"
-        )
+        wavenumbers_cm1 = calibrator.calibrate_fine_with_refined_peaks(wavenumbers_cm1_rough)
 
         # verify that calibrated wavenumbers are within the specified tolerance
         emission_intensities = calibrator.emission_intensities

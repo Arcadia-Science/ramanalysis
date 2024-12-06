@@ -12,6 +12,7 @@ help:
 
 .PHONY: clean
 clean:
+	rm -rf autoapi
 	rm -rf $(BUILDDIR)
 
 .PHONY: clean-and-build-html

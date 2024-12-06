@@ -68,6 +68,7 @@ nbsphinx = "0.9.5"
 # Jupyterlab and matplotlib are needed for notebook rendering.
 jupyterlab = "4.2.5"
 matplotlib = "3.9.2"
+tornado = "^6.4.2"
 
 [tool.ruff]
 # The directories to consider when resolving first- vs. third-party imports.

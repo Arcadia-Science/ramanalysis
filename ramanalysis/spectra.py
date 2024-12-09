@@ -6,7 +6,14 @@ from pathlib import Path
 from natsort import natsorted
 from scipy.signal import find_peaks, medfilt
 
-from .calibrate import _OpenRamanDataCalibrator, _OpenRamanDataProcessor
+from .calibrate import (
+    EXCITATION_WAVELENGTH_NM,
+    FINE_CALIBRATION_RESIDUALS_THRESHOLD,
+    KERNEL_SIZE,
+    ROUGH_CALIBRATION_RESIDUALS_THRESHOLD,
+    _OpenRamanDataCalibrator,
+    _OpenRamanDataProcessor,
+)
 from .peak_fitting import find_n_most_prominent_peaks
 from .readers import (
     read_horiba_txt,
@@ -30,10 +37,10 @@ class RamanSpectrum:
         csv_filepath: Path | str,
         csv_filepath_excitation_calibration: Path | str,
         csv_filepath_emission_calibration: Path | str,
-        excitation_wavelength_nm: float = 532,
-        kernel_size: int = 5,
-        rough_calibration_residuals_threshold: float = 1.0,
-        fine_calibration_residuals_threshold: float = 1e2,
+        excitation_wavelength_nm: float = EXCITATION_WAVELENGTH_NM,
+        kernel_size: int = KERNEL_SIZE,
+        rough_calibration_residuals_threshold: float = ROUGH_CALIBRATION_RESIDUALS_THRESHOLD,
+        fine_calibration_residuals_threshold: float = FINE_CALIBRATION_RESIDUALS_THRESHOLD,
     ) -> RamanSpectrum:
         """Load the calibrated Raman spectrum from a CSV file output by the OpenRAMAN spectrometer.
 
@@ -144,10 +151,10 @@ class RamanSpectra:
         sample_glob_str: str = "*.csv",
         excitation_glob_str: str = "*neon*.csv",
         emission_glob_str: str = "*aceto*.csv",
-        excitation_wavelength_nm: float = 532,
-        kernel_size: int = 5,
-        rough_calibration_residuals_threshold: float = 1.0,
-        fine_calibration_residuals_threshold: float = 1e2,
+        excitation_wavelength_nm: float = EXCITATION_WAVELENGTH_NM,
+        kernel_size: int = KERNEL_SIZE,
+        rough_calibration_residuals_threshold: float = ROUGH_CALIBRATION_RESIDUALS_THRESHOLD,
+        fine_calibration_residuals_threshold: float = FINE_CALIBRATION_RESIDUALS_THRESHOLD,
     ) -> RamanSpectra:
         """Load spectra from a directory of OpenRAMAN data.
 

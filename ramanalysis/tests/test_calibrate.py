@@ -3,18 +3,17 @@ import pytest
 
 from ramanalysis.calibrate import (
     ACETONITRILE_PEAKS_CM1,
+    EXCITATION_WAVELENGTH_NM,
+    FINE_CALIBRATION_RESIDUALS_THRESHOLD,
+    KERNEL_SIZE,
+    ROUGH_CALIBRATION_RESIDUALS_THRESHOLD,
     _OpenRamanDataCalibrator,
     calculate_raman_shift,
 )
 from ramanalysis.peak_fitting import find_n_most_prominent_peaks
 
-# set tolerances for testing
-ROUGH_CALIBRATION_RESIDUALS_THRESHOLD = 1
-FINE_CALIBRATION_RESIDUALS_THRESHOLD = 100
+# set tolerance for testing
 FINE_CALIBRATION_TOLERANCE_CM1 = 4
-# set parameters for calibration
-EXCITATION_WAVELENGTH_NM = 532
-KERNEL_SIZE = 5
 
 
 def test_calculate_raman_shift_basic():

@@ -35,6 +35,10 @@ NEON_PEAKS_NM: ScalarArray = np.array(
     ]
 )
 ACETONITRILE_PEAKS_CM1: ScalarArray = np.array([918, 1376, 2249, 2942, 2999])
+EXCITATION_WAVELENGTH_NM: float = 532.0
+KERNEL_SIZE: int = 5
+ROUGH_CALIBRATION_RESIDUALS_THRESHOLD = 1e0
+FINE_CALIBRATION_RESIDUALS_THRESHOLD = 1e2
 
 
 class _OpenRamanDataProcessor:
@@ -46,9 +50,9 @@ class _OpenRamanDataProcessor:
         csv_filepath_excitation_calibration: Path | str,
         csv_filepath_emission_calibration: Path | str,
         excitation_wavelength_nm: float,
-        kernel_size: int,
-        rough_calibration_residuals_threshold: float,
-        fine_calibration_residuals_threshold: float,
+        kernel_size: int = KERNEL_SIZE,
+        rough_calibration_residuals_threshold: float = ROUGH_CALIBRATION_RESIDUALS_THRESHOLD,
+        fine_calibration_residuals_threshold: float = FINE_CALIBRATION_RESIDUALS_THRESHOLD,
     ) -> None:
         self.csv_filepath = Path(csv_filepath)
         self.csv_filepath_excitation_calibration = Path(csv_filepath_excitation_calibration)
@@ -98,9 +102,9 @@ class _OpenRamanDataCalibrator:
         csv_filepath_excitation_calibration: Path | str,
         csv_filepath_emission_calibration: Path | str,
         excitation_wavelength_nm: float,
-        kernel_size: int,
-        rough_calibration_residuals_threshold: float,
-        fine_calibration_residuals_threshold: float,
+        kernel_size: int = KERNEL_SIZE,
+        rough_calibration_residuals_threshold: float = ROUGH_CALIBRATION_RESIDUALS_THRESHOLD,
+        fine_calibration_residuals_threshold: float = FINE_CALIBRATION_RESIDUALS_THRESHOLD,
     ) -> None:
         self.csv_filepath_excitation_calibration = Path(csv_filepath_excitation_calibration)
         self.csv_filepath_emission_calibration = Path(csv_filepath_emission_calibration)

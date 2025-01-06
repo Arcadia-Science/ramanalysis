@@ -115,6 +115,7 @@ def test_read_horiba_metadata(valid_horiba_txt_filepath):
     assert metadata["Dark correction"] == "Off"
     assert metadata["AxisUnit[1]"] == "1/cm"
 
+
 def test_read_wasatch_metadata(valid_wasatch_csv_filepath):
     *_, metadata = read_wasatch_csv(valid_wasatch_csv_filepath)
     assert metadata["ENLIGHTEN Version"] == "4.1.6"

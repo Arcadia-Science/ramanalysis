@@ -3,7 +3,12 @@ from io import StringIO
 import numpy as np
 import pytest
 
-from ramanalysis.readers import read_horiba_txt, read_openraman_csv
+from ramanalysis.readers import (
+    read_horiba_txt,
+    read_openraman_csv,
+    read_renishaw_csv,
+    read_wasatch_csv,
+)
 
 
 def test_read_openraman_csv_basic(valid_openraman_csv_filepath):
@@ -81,8 +86,37 @@ def test_read_openraman_csv_missing_column():
 
 
 def test_read_horiba_txt_basic(valid_horiba_txt_filepath):
-    wavenumbers_cm1, intensities = read_horiba_txt(valid_horiba_txt_filepath)
+    wavenumbers_cm1, intensities, _metadata = read_horiba_txt(valid_horiba_txt_filepath)
     first_five_wavenumbers = [87.8957, 90.0299, 92.1642, 94.2969, 96.4298]
     first_five_intensities = [620.5, 680.5, 704.5, 705.0, 741.0]
     np.testing.assert_allclose(wavenumbers_cm1[:5], first_five_wavenumbers, rtol=1e-2)
     np.testing.assert_allclose(intensities[:5], first_five_intensities, rtol=1e-2)
+
+
+def test_read_renishaw_csv_basic(valid_renishaw_csv_filepath):
+    wavenumbers_cm1, intensities = read_renishaw_csv(valid_renishaw_csv_filepath)
+    first_five_wavenumbers = [717.258789, 716.048828, 714.837891, 713.626953, 712.416016]
+    first_five_intensities = [839088.625, 841384.125, 839254.75, 841847.625, 839767.875]
+    np.testing.assert_allclose(wavenumbers_cm1[:5], first_five_wavenumbers, rtol=1e-2)
+    np.testing.assert_allclose(intensities[:5], first_five_intensities, rtol=1e-2)
+
+
+def test_read_wasatch_csv_basic(valid_wasatch_csv_filepath):
+    wavenumbers_cm1, intensities, _metadata = read_wasatch_csv(valid_wasatch_csv_filepath)
+    first_five_wavenumbers = [260.19, 262.64, 265.08, 267.53, 269.97]
+    first_five_intensities = [2111.50, 2021.50, 2072.50, 2003.00, 1977.00]
+    np.testing.assert_allclose(wavenumbers_cm1[:5], first_five_wavenumbers, rtol=1e-2)
+    np.testing.assert_allclose(intensities[:5], first_five_intensities, rtol=1e-2)
+
+
+def test_read_horiba_metadata(valid_horiba_txt_filepath):
+    *_, metadata = read_horiba_txt(valid_horiba_txt_filepath)
+    assert metadata["Acq. time (s)"] == "10"
+    assert metadata["Dark correction"] == "Off"
+    assert metadata["AxisUnit[1]"] == "1/cm"
+
+def test_read_wasatch_metadata(valid_wasatch_csv_filepath):
+    *_, metadata = read_wasatch_csv(valid_wasatch_csv_filepath)
+    assert metadata["ENLIGHTEN Version"] == "4.1.6"
+    assert metadata["Laser Power mW"] == "100.0"
+    assert metadata["Pixel Count"] == "2048"

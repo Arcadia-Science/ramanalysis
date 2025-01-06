@@ -36,6 +36,16 @@ def valid_horiba_txt_filepath(test_data_directory):
 
 
 @pytest.fixture
+def valid_renishaw_csv_filepath(test_data_directory):
+    return test_data_directory / "Renishaw" / "cell_6.csv"
+
+
+@pytest.fixture
+def valid_wasatch_csv_filepath(test_data_directory):
+    return test_data_directory / "Wasatch" / "acetonitrile.csv"
+
+
+@pytest.fixture
 def valid_synthetic_spectrum_wavenumbers(test_data_directory):
     valid_synthetic_spectrum_filepath = (
         test_data_directory / "synthetic_data" / "fake_spectrum_0.txt"

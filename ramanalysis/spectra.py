@@ -18,6 +18,8 @@ from .peak_fitting import find_n_most_prominent_peaks
 from .readers import (
     read_horiba_txt,
     read_openraman_csv,
+    read_renishaw_csv,
+    read_wasatch_csv,
 )
 from .typing import FloatArray
 
@@ -75,7 +77,19 @@ class RamanSpectrum:
     @classmethod
     def from_horiba_txtfile(cls, txt_filepath: Path | str) -> RamanSpectrum:
         """Load a Raman spectrum from a TXT file output by the Horiba MacroRam."""
-        wavenumbers_cm1, intensities = read_horiba_txt(txt_filepath)
+        wavenumbers_cm1, intensities, _metadata = read_horiba_txt(txt_filepath)
+        return RamanSpectrum(wavenumbers_cm1, intensities)
+
+    @classmethod
+    def from_renishaw_csvfile(cls, csv_filepath: Path | str) -> RamanSpectrum:
+        """Load a Raman spectrum from a TXT file output by the Horiba MacroRam."""
+        wavenumbers_cm1, intensities = read_renishaw_csv(csv_filepath)
+        return RamanSpectrum(wavenumbers_cm1, intensities)
+
+    @classmethod
+    def from_wasatch_csvfile(cls, csv_filepath: Path | str) -> RamanSpectrum:
+        """Load a Raman spectrum from a TXT file output by the Horiba MacroRam."""
+        wavenumbers_cm1, intensities, _metadata = read_wasatch_csv(csv_filepath)
         return RamanSpectrum(wavenumbers_cm1, intensities)
 
     @property
@@ -84,18 +98,24 @@ class RamanSpectrum:
 
     def between(self, min_wavenumber_cm1: float, max_wavenumber_cm1: float) -> RamanSpectrum:
         """Clip spectrum to a specified spectral range."""
-
         mask = (self.wavenumbers_cm1 > min_wavenumber_cm1) & (
             self.wavenumbers_cm1 < max_wavenumber_cm1
         )
         return RamanSpectrum(self.wavenumbers_cm1[mask], self.intensities[mask])
 
     def normalize(self) -> RamanSpectrum:
-        """Normalize intensities with min-max normalization."""
+        """Scale intensities with min-max normalization."""
         _min = self.intensities.min()
         _max = self.intensities.max()
-        normalized_intensities = (self.intensities - _min) / (_max - _min)
-        return RamanSpectrum(self.wavenumbers_cm1, normalized_intensities)
+        scaled_intensities = (self.intensities - _min) / (_max - _min)
+        return RamanSpectrum(self.wavenumbers_cm1, scaled_intensities)
+
+    def standardize(self) -> RamanSpectrum:
+        """Scale intensities with mean-std standardization."""
+        mean = self.intensities.mean()
+        std = self.intensities.std()
+        scaled_intensities = (self.intensities - mean) / std
+        return RamanSpectrum(self.wavenumbers_cm1, scaled_intensities)
 
     def smooth(self, kernel_size: int = 5) -> RamanSpectrum:
         """Smooth intensities with median filtering."""

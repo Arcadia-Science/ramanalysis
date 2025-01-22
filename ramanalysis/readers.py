@@ -17,33 +17,55 @@ def read_openraman_csv(csv_filepath: Path | str) -> FloatArray:
     not automatically calibrated by the instrument, and thus must be calibrated in a subsequent
     step using known reference values from a standard sample. Metadata must also be captured
     separately as it is not stored in the CSV file.
+
+    As the software and hardware for the OpenRAMAN is under active development, the format of the
+    output CSV file is not static. Sometimes the column name is "Intensity (a.u.)" and sometimes
+    it is "Intensity".
     """
     dataframe = pd.read_csv(csv_filepath)  # type: ignore
-    intensities = np.array(dataframe["Intensity (a.u.)"].values).astype(np.float64)
+
+    # check that file has expected column names
+    if not any(column.lower().startswith("intens") for column in dataframe.columns):
+        msg = (
+            "Expected column 'Intensity' or 'Intensity (a. u.)', but received "
+            f"{dataframe.columns.tolist()} instead."
+        )
+        raise KeyError(msg)
+
+    # determine which column has intensity data
+    intensity_column_index = next(
+        i for i, name in enumerate(dataframe.columns) if name.lower().startswith("intens")
+    )
+    intensities = np.array(dataframe.iloc[:, intensity_column_index].values).astype(np.float64)
     return intensities
 
 
-def read_horiba_txt(txt_filepath: Path | str) -> tuple[FloatArray, FloatArray, dict]:
-    """Read data from a text file output by the Horiba MacroRam.
+def read_horiba_txt(
+    txt_filepath: Path | str,
+    num_skip_rows: int = 32,
+) -> tuple[FloatArray, FloatArray, dict]:
+    """Read data from a text file output by the Horiba MacroRam or the Horiba LabRAM.
 
-    Spectral range is automatically calibrated by the instrument but is in descending order
-    (high wavenumbers --> low wavenumbers), so we flip the order.
+    The TXT files output by the two different instruments vary only in the number of rows in
+    the header: 32 for the MacroRAM and 47 for the LabRAM. Spectral range is automatically
+    calibrated by the instrument but is in descending order (high wavenumbers --> low wavenumbers),
+    so we flip the order.
     """
-    # read metadata -- first 32 lines
+    # read metadata
     metadata = {}
     with open(txt_filepath, encoding="utf-8", errors="ignore") as txt_file:
         metadata_text = txt_file.read()
-        metadata_lines = metadata_text.splitlines()[:32]
+        metadata_lines = metadata_text.splitlines()[:num_skip_rows]
     for line in metadata_lines:
         property, value = line.split("=")
         property = property.replace("#", "")
         metadata[property] = value.replace("\t", "")
 
-    # read spectral data -- starts on line 33
+    # read spectral data
     column_names = ["wavenumber_cm-1", "intensity"]
     dataframe = pd.read_csv(  # type: ignore
         txt_filepath,
-        skiprows=32,
+        skiprows=num_skip_rows,
         header=None,
         names=column_names,
         sep="\t",
@@ -56,55 +78,104 @@ def read_horiba_txt(txt_filepath: Path | str) -> tuple[FloatArray, FloatArray, d
     return wavenumbers_cm1, intensities, metadata
 
 
-def read_renishaw_csv(csv_filepath: Path | str) -> tuple[FloatArray, FloatArray]:
-    """Read data from a CSV file output by the Renishaw Qontor.
+def read_renishaw_singlepoint_txt(txt_filepath: Path | str) -> tuple[FloatArray, FloatArray]:
+    """Read data from a TXT file output by the Renishaw Qontor single-point scan.
 
-    The Renishaw Qontor stores spectral data in a sensical, but somewhat cumbersome manner
-    when data is recorded using the mapping capabilities. Spectra from each (X, Y) position
-    in the scan are saved and output to the same TXT file. So depending on how the experiment
-    is set up, one output file could contain either multiple technical replicates, biological
-    replicates, or different specimen altogether without any real way of knowing. Additionally,
-    no metadata is saved. This means the raw data output by the Renishaw is usually processed and
-    organized to better match the CSV files from the other spectrometers. This isn't ideal, but
-    was the most practical workaround I could come up with. Example raw data:
+    Data from the Renishaw comes in (at least) two slightly different forms: single-point scanning
+    and multipoint scanning. Example raw data from a single-point scan:
 
-        #X		#Y		#Wave		#Intensity
-        -143.855707	-3313.582825	1808.186523	210291.000000
-        -143.855707	-3313.582825	1807.220703	211172.062500
-        -143.855707	-3313.582825	1806.254883	211110.218750
+        #Wave       #Intensity
+        3399.408203 1016.205444
+        3398.738281 1008.868225
+        3398.067383 1016.025818
         ...
-        -141.829040	-3327.361151	1808.186523	231103.140625
-        -141.829040	-3327.361151	1807.220703	230652.421875
-        -141.829040	-3327.361151	1806.254883	230639.968750
-        ...
+        602.157227  41879.410156
+        600.934570  41363.480469
 
-    After processing:
-        `sample-1.csv` -- first (X, Y) position:
-            #Wave,#Intensity
-            1808.186523,210291.000000
-            1807.220703,211172.062500
-            1806.254883,211110.218750
-            ...
-        `sample-2.csv` -- next (X, Y) position:
-            #Wave,#Intensity
-            1808.186523,231103.140625
-            1807.220703,230652.421875
-            1806.254883,230639.968750
-            ...
-
-    Spectral range is automatically calibrated by the instrument but is in descending order
-    (high wavenumbers --> low wavenumbers), so we flip the order.
+    See also:
+        - To read data from a multipoint scan, see :func:`read_renishaw_multipoint_txt`
     """
     # read spectral data -- no metadata in the header
-    column_names = ["#Wave", "#Intensity"]
     dataframe = pd.read_csv(  # type: ignore
-        csv_filepath,
+        txt_filepath,
+        sep=r"\s+",
     )
 
+    # check that file has expected column names
+    singlepoint_column_names = ["#Wave", "#Intensity"]
+    if len(dataframe.columns) != 2 or not all(
+        column in dataframe.columns for column in singlepoint_column_names
+    ):
+        msg = (
+            "Expected columns '#Wave' and '#Intensity', but received "
+            f"{dataframe.columns.tolist()} instead."
+        )
+        raise KeyError(msg)
+
     # convert spectral data to numpy arrays
-    wavenumbers_cm1 = np.array(dataframe[column_names[0]].values)[::-1].astype(np.float64)
-    intensities = np.array(dataframe[column_names[1]].values)[::-1].astype(np.float64)
+    wavenumbers_cm1 = np.array(dataframe["#Wave"].values)[::-1].astype(np.float64)
+    intensities = np.array(dataframe["#Intensity"].values)[::-1].astype(np.float64)
     return wavenumbers_cm1, intensities
+
+
+def read_renishaw_multipoint_txt(
+    txt_filepath: Path | str,
+) -> tuple[FloatArray, FloatArray, FloatArray]:
+    """Read data from a TXT file output by the Renishaw Qontor multipoint scan.
+
+    Data from the Renishaw comes in (at least) two slightly different forms: single-point scanning
+    and multipoint scanning. Multipoint scanning can either be in a grid-like pattern to form
+    an image or just an arbitrary sequence of points. Example raw data from a multipoint scan:
+
+        #X          #Y          #Wave       #Intensity
+        -8.312373   145.838849  1808.186523 221543.765625
+        -8.312373   145.838849  1807.220703 222801.703125
+        -8.312373   145.838849  1806.254883 222370.828125
+        ...
+        66.420960   84.856999   713.626953  118237.062500
+        66.420960   84.856999   712.416016  118192.578125
+
+    There is no metadata saved in the TXT file to read. Spectral range is automatically calibrated
+    by the instrument but is in descending order (high wavenumbers --> low wavenumbers), so we
+    flip the order. Wavenumber data is redundant in that each point in the scan has intensity
+    values distributed over the same wavenumber range.
+
+    See also:
+        - To read data from a single-point scan, see :func:`read_renishaw_singlepoint_txt`.
+    """
+    # read spectral data -- no metadata in the header
+    dataframe = pd.read_csv(  # type: ignore
+        txt_filepath,
+        sep=r"\s+",
+    )
+
+    # check that file has expected column names
+    multipoint_column_names = ["#X", "#Y", "#Wave", "#Intensity"]
+    if len(dataframe.columns) != 4 or not all(
+        column in dataframe.columns for column in multipoint_column_names
+    ):
+        msg = (
+            "Expected columns '#X', '#Y', '#Wave' and '#Intensity', but received "
+            f"{dataframe.columns.tolist()} instead."
+        )
+        raise KeyError(msg)
+
+    # extract wavenumber and intensity data at each (X, Y) position
+    x_positions: list[float] = []
+    y_positions: list[float] = []
+    intensities = []
+    for (x_position, y_position), spectral_data in dataframe.groupby(["#X", "#Y"], sort=False):  # type: ignore
+        wavenumbers_cm1 = spectral_data["#Wave"].values[::-1]
+        intensities.append(spectral_data["#Intensity"].values[::-1])  # type: ignore
+        x_positions.append(x_position)
+        y_positions.append(y_position)
+
+    # convert spectral data and position data to numpy arrays
+    wavenumbers_cm1 = np.array(wavenumbers_cm1, dtype=np.float64)
+    intensities = np.array(intensities, dtype=np.float64)
+    positions = np.stack([x_positions, y_positions], axis=1)
+
+    return wavenumbers_cm1, intensities, positions
 
 
 def read_wasatch_csv(csv_filepath: Path | str) -> tuple[FloatArray, FloatArray, dict]:

@@ -51,7 +51,7 @@ def test_read_renishaw_multipoint_txt_basic(valid_renishaw_multipoint_filepath):
         [-10.722373, 21.898673],
         [-19.589040, 8.375501],
         [-26.935707, 9.396118],
-        [-32.255707, -9.485292]
+        [-32.255707, -9.485292],
     ]
     np.testing.assert_allclose(wavenumbers_cm1[:5], first_five_wavenumbers)
     np.testing.assert_allclose(intensities[:, :5], first_five_intensities)

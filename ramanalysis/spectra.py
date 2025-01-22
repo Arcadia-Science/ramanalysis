@@ -146,7 +146,14 @@ class RamanSpectrum:
         mask = (self.wavenumbers_cm1 > min_wavenumber_cm1) & (
             self.wavenumbers_cm1 < max_wavenumber_cm1
         )
-        return RamanSpectrum(self.wavenumbers_cm1[mask], self.intensities[mask])
+        if ~mask.any():
+            msg = (
+                f"No spectral data within the specified clipping range ({min_wavenumber_cm1}, "
+                f"{max_wavenumber_cm1})."
+            )
+            raise ValueError(msg)
+        else:
+            return RamanSpectrum(self.wavenumbers_cm1[mask], self.intensities[mask])
 
     def interpolate(
         self,

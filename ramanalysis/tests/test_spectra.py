@@ -135,6 +135,15 @@ def test_raman_spectrum_from_synthetic_data(
     assert spectrum.wavenumbers_cm1[0] == 800
 
 
+def test_between_out_of_range():
+    spectrum = RamanSpectrum(
+        wavenumbers_cm1=np.array([200, 201, 202, 203, 204]),
+        intensities=np.array([0.2, 0.3, 1.0, 0.3, 0.2]),
+    )
+    with pytest.raises(ValueError):
+        spectrum.between(-4, 3)
+
+
 def test_interpolate_float():
     spectrum = RamanSpectrum(
         wavenumbers_cm1=np.array([200, 201, 202, 203, 204]),

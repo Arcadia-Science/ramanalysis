@@ -25,7 +25,7 @@ def read_openraman_csv(csv_filepath: Path | str) -> FloatArray:
     dataframe = pd.read_csv(csv_filepath)  # type: ignore
 
     # check that file has expected column names
-    if not any(column.lower().startswith("intens") for column in dataframe.columns):
+    if not any(column.lower().startswith("intensity") for column in dataframe.columns):
         msg = (
             "Expected column 'Intensity' or 'Intensity (a. u.)', but received "
             f"{dataframe.columns.tolist()} instead."

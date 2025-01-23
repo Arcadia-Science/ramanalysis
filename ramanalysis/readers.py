@@ -33,10 +33,10 @@ def read_openraman_csv(csv_filepath: Path | str) -> FloatArray:
         raise KeyError(msg)
 
     # determine which column has intensity data
-    intensity_column_index = next(
-        i for i, name in enumerate(dataframe.columns) if name.lower().startswith("intensity")
+    intensity_column_name = next(
+        name for name in dataframe.columns if name.lower().startswith("intensity")
     )
-    intensities = np.array(dataframe.iloc[:, intensity_column_index].values).astype(np.float64)
+    intensities = np.array(dataframe.loc[:, intensity_column_name].values).astype(np.float64)
     return intensities
 
 

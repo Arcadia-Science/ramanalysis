@@ -5,10 +5,14 @@ This folder contains several sources of example Raman spectroscopy data useful f
 ### Directory tree
 ```
 ─ Horiba
-  ├── CC-124-TAP.txt
-  ├── CC-125-TAP.txt
-  ├── CC-1373-TAP.txt
-  └── polystyrene.txt
+  ├── LabRAM
+  │   ├── CC-124_TAP_532nm.txt
+  │   └── acetonitrile_473nm.txt
+  └── MacroRAM
+      ├── CC-124-TAP.txt
+      ├── CC-125-TAP.txt
+      ├── CC-1373-TAP.txt
+      └── polystyrene.txt
 ─ OpenRAMAN
   ├── 2024-10-04_CC-124-TAP_n_n_solid_10000_0_5.csv
   ├── 2024-10-04_CC-125-TAP_n_n_solid_10000_0_5.csv
@@ -19,27 +23,23 @@ This folder contains several sources of example Raman spectroscopy data useful f
   └── calibration_data
       ├── 2024-08-20_acetonitrileinquartzcuvette_n_n_solid_500_0_5.csv
       ├── 2024-08-20_neon_n_n_solid_1000_0_5.csv
-      ├── 2024-08-27_acetonitrile_n_n_solid_1000_0_5.csv
-      ├── 2024-08-27_neon_n_n_solid_1000_0_5.csv
       ├── ...
       ├── 2024-10-29_acetonitrile-control_n_n_n_solid_10000_0_5.csv
       └── 2024-10-29_neon-control_n_n_n_solid_1000_0_5.csv
+─ Renishaw
+  ├── CC-125_TAP_multipoint.txt
+  └── CC-125_TAP_singlepoint.txt
+─ Wasatch
+  └── acetonitrile.csv
 ─ synthetic_data
   ├── fake_spectrum_0.txt
-  ├── fake_spectrum_1.txt
-  ├── fake_spectrum_2.txt
-  ├── fake_spectrum_3.txt
-  ├── fake_spectrum_4.txt
-  ├── fake_spectrum_5.txt
-  ├── fake_spectrum_6.txt
-  ├── fake_spectrum_7.txt
-  ├── fake_spectrum_8.txt
+  ├── ...
   └── fake_spectrum_9.txt
 ```
 
 
 ### Horiba
-Contains several spectra of three different strains of *Chlamydomonas* (marine algae) cell cultures as well as one spectrum of polystyrene acquired by the [Horiba MacroRAM](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/macroramtm-805/). The Horiba MacroRAM uses a 785 nm laser with power ranging from 7–450 mW. Acquisition settings were the same for all samples:
+Contains several spectra polystyrene, acetonitrile, and three different strains of *Chlamydomonas* (marine algae) cell cultures acquired by the [Horiba MacroRAM](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/macroramtm-805/) and [Horiba LabRAM](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/labram-hr-evolution-1083/). The Horiba MacroRAM uses a 785 nm laser with power ranging from 7–450 mW, while the LabRAM had several laser wavelengths available (473 nm, 532 nm, 633 nm). Acquisition settings were the same for all samples:
 
 Parameter | Value
 -- | --
@@ -65,6 +65,30 @@ Contains several spectra of three different strains of *Chlamydomonas* (marine a
 All files were acquired with the solid cuvette for 10 s and averaged over 5 acquisitions with no median filtering or baseline subtraction applied.
 
 This folder also contains 34 files of calibration data, comprised of 17 pairs of neon and acetonitrile spectra measured with various acquisition settings between August and October 2024. The neon spectra serves as the broadband excitation light source for the rough calibration, while the acetonitrile spectra serves as the Raman-scattered light from a known reference for the fine calibration.
+
+
+### Renishaw
+Contains spectral data from one single-point measurement and one multipoint measurement of one strain of *Chlamydomonas* (marine algae) cell cultures acquired by the [Renishaw Qontor](https://www.renishaw.com/en/invia-confocal-raman-microscope--6260?srsltid=AfmBOooiKo_pI7dx9z-CQavJXivfP0KPDkhLiVhLkZwlbUbagLsJA3d2). The multipoint acquisition was truncated to only include 4 positions at arbitrary locations within the petri dish. Acquisition settings were the same for all samples:
+
+Parameter | Value
+-- | --
+Wavelength | 785 nm
+Exposure | 10 s
+Num accumulations | 5
+Laser power | 300 mW
+
+
+### Wasatch
+Contains spectral data from one measurement of acetonitrile acquired by the [Wasatch WP 785X](https://wasatchphotonics.com/product/wp-785x-raman-spectrometer-series/). Acquisition settings for the acetonitrile sample:
+
+Parameter | Value
+-- | --
+Wavelength | 785 nm
+Exposure | 3 s
+Num accumulations | 2
+Laser power | 50 mW
+
+The full list of acquisition settings can be found in the metadata of each file.
 
 
 ### Synthetic data

@@ -1,6 +1,5 @@
-from ramanalysis.spectra import RamanSpectra, RamanSpectrum
+from ramanalysis.spectra import RamanSpectrum
 
 __all__ = [
     "RamanSpectrum",
-    "RamanSpectra",
 ]

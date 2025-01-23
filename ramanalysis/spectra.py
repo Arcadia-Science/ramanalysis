@@ -2,8 +2,9 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
-from natsort import natsorted
+import numpy as np
 from scipy.signal import find_peaks, medfilt
 
 from .calibrate import (
@@ -11,17 +12,15 @@ from .calibrate import (
     FINE_CALIBRATION_RESIDUALS_THRESHOLD,
     KERNEL_SIZE,
     ROUGH_CALIBRATION_RESIDUALS_THRESHOLD,
-    _OpenRamanDataCalibrator,
     _OpenRamanDataProcessor,
 )
 from .peak_fitting import find_n_most_prominent_peaks
 from .readers import (
     read_horiba_txt,
-    read_openraman_csv,
-    read_renishaw_csv,
+    read_renishaw_singlepoint_txt,
     read_wasatch_csv,
 )
-from .typing import FloatArray
+from .typing import FloatArray, FloatOrArray
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +31,42 @@ class RamanSpectrum:
 
     wavenumbers_cm1: FloatArray
     intensities: FloatArray
+
+    def __post_init__(self):
+        # ensure inputs are numpy float arrays
+        object.__setattr__(
+            self, "wavenumbers_cm1", np.asarray(self.wavenumbers_cm1, dtype=np.float64)
+        )
+        object.__setattr__(self, "intensities", np.asarray(self.intensities, dtype=np.float64))
+
+        # validate no NaN values
+        if np.isnan(self.wavenumbers_cm1).any():
+            raise ValueError("Wavenumber data must not contain NaN values.")
+        if np.isnan(self.intensities).any():
+            raise ValueError("Intensity data must not contain NaN values.")
+
+        # validate array sizes
+        if self.wavenumbers_cm1.size == 0:
+            raise ValueError("Received empty array for wavenumber data.")
+        if self.intensities.size == 0:
+            raise ValueError("Received empty array for intensity data.")
+        if self.wavenumbers_cm1.ndim != 1:
+            raise ValueError("Wavenumber data must be one-dimensional and array-like.")
+        if self.intensities.ndim < 1:
+            raise ValueError("Intensity data must be at least one-dimensional and array-like.")
+        if (self.intensities.ndim == 1) and not (
+            self.wavenumbers_cm1.size == self.intensities.size
+        ):
+            msg = (
+                "Wavenumbers and intensities must be the same size when intensities are "
+                f"one-dimensional arrays, but received sizes {self.wavenumbers_cm1.size} and "
+                f"{self.intensities.size}."
+            )
+            raise ValueError(msg)
+
+        # validate that wavenumber data is monotonically increasing
+        if not np.all(self.wavenumbers_cm1[:-1] <= self.wavenumbers_cm1[1:]):
+            raise ValueError("Wavenumber data must be monotonically increasing.")
 
     @classmethod
     def from_openraman_csvfiles(
@@ -75,20 +110,31 @@ class RamanSpectrum:
         return RamanSpectrum(wavenumbers_cm1, intensities)
 
     @classmethod
-    def from_horiba_txtfile(cls, txt_filepath: Path | str) -> RamanSpectrum:
-        """Load a Raman spectrum from a TXT file output by the Horiba MacroRam."""
-        wavenumbers_cm1, intensities, _metadata = read_horiba_txt(txt_filepath)
+    def from_horiba_txtfile(
+        cls,
+        txt_filepath: Path | str,
+        num_skip_rows: int = 32,
+    ) -> RamanSpectrum:
+        """Load a Raman spectrum from a TXT file output by the Horiba MacroRam or LabRAM."""
+        wavenumbers_cm1, intensities, _metadata = read_horiba_txt(txt_filepath, num_skip_rows)
         return RamanSpectrum(wavenumbers_cm1, intensities)
 
     @classmethod
-    def from_renishaw_csvfile(cls, csv_filepath: Path | str) -> RamanSpectrum:
-        """Load a Raman spectrum from a TXT file output by the Horiba MacroRam."""
-        wavenumbers_cm1, intensities = read_renishaw_csv(csv_filepath)
+    def from_renishaw_txtfile(cls, csv_filepath: Path | str) -> RamanSpectrum:
+        """Load a Raman spectrum from a TXT file output by the Renishaw Qontor.
+
+        Only supports data from a single point scan.
+
+        See also:
+            - To instantiate :obj:`RamanSpectra` from a multipoint scan,
+            see :func:`RamanSpectra.from_renishaw_txtfile`.
+        """
+        wavenumbers_cm1, intensities = read_renishaw_singlepoint_txt(csv_filepath)
         return RamanSpectrum(wavenumbers_cm1, intensities)
 
     @classmethod
     def from_wasatch_csvfile(cls, csv_filepath: Path | str) -> RamanSpectrum:
-        """Load a Raman spectrum from a TXT file output by the Horiba MacroRam."""
+        """Load a Raman spectrum from a CSV file output by the Wasatch WP 785X."""
         wavenumbers_cm1, intensities, _metadata = read_wasatch_csv(csv_filepath)
         return RamanSpectrum(wavenumbers_cm1, intensities)
 
@@ -101,7 +147,45 @@ class RamanSpectrum:
         mask = (self.wavenumbers_cm1 > min_wavenumber_cm1) & (
             self.wavenumbers_cm1 < max_wavenumber_cm1
         )
-        return RamanSpectrum(self.wavenumbers_cm1[mask], self.intensities[mask])
+        if ~mask.any():
+            msg = (
+                f"No spectral data within the specified clipping range ({min_wavenumber_cm1}, "
+                f"{max_wavenumber_cm1})."
+            )
+            raise ValueError(msg)
+        else:
+            return RamanSpectrum(self.wavenumbers_cm1[mask], self.intensities[mask])
+
+    def interpolate(
+        self,
+        float_indices: FloatOrArray,
+    ) -> tuple[FloatOrArray, FloatOrArray]:
+        """One-dimensional linear interpolation.
+
+        Examples:
+            Get wavenumbers and intensities corresponding to detected peak positions:
+
+            >>> from ramanalysis.peak_fitting import find_n_most_prominent_peaks
+            >>> t = np.linspace(0, np.pi * 5, 1000)
+            >>> signal = np.sin(np.pi/2 * t) + np.sin(np.pi/3 * t)
+            >>> spectrum = RamanSpectrum(wavenumbers_cm1=t + 200, intensities=signal)
+            >>> i_peaks = find_n_most_prominent_peaks(spectrum.intensities, num_peaks=4)
+            >>> peaks_cm1, peak_heights = spectrum.interpolate(i_peaks)
+            >>> peaks_cm1
+            array([201.14782915, 205.34605356, 208.58513308, 213.14500229])
+            >>> peak_heights
+            array([1.90592364, 0.22333604, 1.21598056, 1.90586467])
+        """
+        interpolated_wavenumbers_cm1 = np.interp(
+            float_indices, np.arange(self.wavenumbers_cm1.size), self.wavenumbers_cm1
+        )
+        interpolated_intensities = np.interp(
+            float_indices, np.arange(self.intensities.size), self.intensities
+        )
+        return (
+            cast(FloatOrArray, interpolated_wavenumbers_cm1),
+            cast(FloatOrArray, interpolated_intensities),
+        )
 
     def normalize(self) -> RamanSpectrum:
         """Scale intensities with min-max normalization."""
@@ -156,50 +240,3 @@ class RamanSpectrum:
             **kwargs,
         )
         return self.wavenumbers_cm1[peak_indices]  # type: ignore
-
-
-@dataclass
-class RamanSpectra:
-    """A dataclass for a collection of Raman spectroscopy data."""
-
-    spectra: dict[str, RamanSpectrum]
-
-    @classmethod
-    def from_openraman_directory_dirty(
-        cls,
-        filepath: Path | str,
-        sample_glob_str: str = "*.csv",
-        excitation_glob_str: str = "*neon*.csv",
-        emission_glob_str: str = "*aceto*.csv",
-        excitation_wavelength_nm: float = EXCITATION_WAVELENGTH_NM,
-        kernel_size: int = KERNEL_SIZE,
-        rough_calibration_residuals_threshold: float = ROUGH_CALIBRATION_RESIDUALS_THRESHOLD,
-        fine_calibration_residuals_threshold: float = FINE_CALIBRATION_RESIDUALS_THRESHOLD,
-    ) -> RamanSpectra:
-        """Load spectra from a directory of OpenRAMAN data.
-
-        TODO: This is "dirty" because of its reliance on glob string expressions. A better option
-        might be to load from a datasheet that specifies all the sample filenames and calibration
-        data file paths.
-        """
-
-        csv_filepaths_samples = natsorted(Path(filepath).glob(sample_glob_str))
-        csv_filepath_excitation_calibration = next(Path(filepath).glob(excitation_glob_str))
-        csv_filepath_emission_calibration = next(Path(filepath).glob(emission_glob_str))
-
-        wavenumbers_cm1 = _OpenRamanDataCalibrator(
-            csv_filepath_excitation_calibration,
-            csv_filepath_emission_calibration,
-            excitation_wavelength_nm,
-            kernel_size,
-            rough_calibration_residuals_threshold,
-            fine_calibration_residuals_threshold,
-        ).calibrate()
-
-        spectra = {}
-        for csv_filepath in csv_filepaths_samples:
-            sample_name = csv_filepath.stem
-            intensities = read_openraman_csv(csv_filepath)
-            spectra[sample_name] = RamanSpectrum(wavenumbers_cm1, intensities)
-
-        return RamanSpectra(spectra)

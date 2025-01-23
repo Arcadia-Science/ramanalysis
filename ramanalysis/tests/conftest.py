@@ -31,13 +31,28 @@ def valid_openraman_emission_csv_filepath(test_data_directory):
 
 
 @pytest.fixture
-def valid_horiba_txt_filepath(test_data_directory):
-    return test_data_directory / "Horiba" / "polystyrene.txt"
+def valid_horiba_singlepoint_txt_filepath(test_data_directory):
+    return test_data_directory / "Horiba" / "MacroRAM" / "polystyrene.txt"
 
 
 @pytest.fixture
-def valid_renishaw_csv_filepath(test_data_directory):
-    return test_data_directory / "Renishaw" / "cell_6.csv"
+def valid_renishaw_singlepoint_filepath(test_data_directory):
+    return test_data_directory / "Renishaw" / "CC-125_TAP_singlepoint.txt"
+
+
+@pytest.fixture
+def valid_renishaw_multipoint_filepath(test_data_directory):
+    return test_data_directory / "Renishaw" / "CC-125_TAP_multipoint.txt"
+
+
+@pytest.fixture
+def invalid_renishaw_singlepoint_filepath(test_data_directory):
+    return test_data_directory / "Renishaw" / "CC-125_TAP_singlepoint_corrupt.txt"
+
+
+@pytest.fixture
+def invalid_renishaw_multipoint_filepath(test_data_directory):
+    return test_data_directory / "Renishaw" / "CC-125_TAP_multipoint_corrupt.txt"
 
 
 @pytest.fixture

@@ -1,4 +1,5 @@
 from io import StringIO
+from textwrap import dedent
 
 import numpy as np
 import pytest
@@ -73,28 +74,34 @@ def test_read_openraman_csv_noncsv(valid_horiba_singlepoint_txt_filepath):
 
 def test_read_openraman_csv_dtype():
     csv_float_data = StringIO(
-        """
-        Pixels #,Intensity (a.u.)
-        0.00000e+00,6.61781e-01
-        1.00000e+00,6.61274e-01
-        2.00000e+00,6.64067e-01
-        """
+        dedent(
+            """
+            Pixels #,Intensity (a.u.)
+            0.00000e+00,6.61781e-01
+            1.00000e+00,6.61274e-01
+            2.00000e+00,6.64067e-01
+            """
+        )
     )
     csv_int_data = StringIO(
-        """
-        Pixels #,Intensity (a.u.)
-        0.00000e+00,3
-        1.00000e+00,4
-        2.00000e+00,5
-        """
+        dedent(
+            """
+            Pixels #,Intensity (a.u.)
+            0.00000e+00,3
+            1.00000e+00,4
+            2.00000e+00,5
+            """
+        )
     )
     csv_str_data = StringIO(
-        """
-        Pixels #,Intensity (a.u.)
-        0.00000e+00,abc
-        1.00000e+00,xyz
-        2.00000e+00,puppy
-        """
+        dedent(
+            """
+            Pixels #,Intensity (a.u.)
+            0.00000e+00,abc
+            1.00000e+00,xyz
+            2.00000e+00,puppy
+            """
+        )
     )
     # test float --> float
     intensities = read_openraman_csv(csv_float_data)  # type: ignore
@@ -109,12 +116,14 @@ def test_read_openraman_csv_dtype():
 
 def test_read_openraman_csv_nans():
     csv_nan_data = StringIO(
-        """
-        Pixels #,Intensity (a.u.)
-        0.00000e+00,3
-        1.00000e+00,
-        2.00000e+00,5
-        """
+        dedent(
+            """
+            Pixels #,Intensity (a.u.)
+            0.00000e+00,3
+            1.00000e+00,
+            2.00000e+00,5
+            """
+        )
     )
     intensities = read_openraman_csv(csv_nan_data)  # type: ignore
     expected_intensities = np.array([3, np.nan, 5], dtype=np.float64)
@@ -123,12 +132,14 @@ def test_read_openraman_csv_nans():
 
 def test_read_openraman_csv_missing_column():
     csv_data_botched_header = StringIO(
-        """
-        Pixels #,Llama (W)
-        0.00000e+00,6.72077e-01
-        1.00000e+00,6.71534e-01
-        2.00000e+00,6.74614e-01
-        """
+        dedent(
+            """
+            Pixels #,Llama (W)
+            0.00000e+00,6.72077e-01
+            1.00000e+00,6.71534e-01
+            2.00000e+00,6.74614e-01
+            """
+        )
     )
     with pytest.raises(KeyError):
         read_openraman_csv(csv_data_botched_header)  # type: ignore
@@ -136,22 +147,26 @@ def test_read_openraman_csv_missing_column():
 
 def test_read_renishaw_singlepoint_txt_corrupt():
     txt_data_botched_header = StringIO(
-        """
-        #Wav3		#Intensity
-        3399.408203	1016.205444
-        3398.738281	1008.868225
-        3398.067383	1016.025818
-        3397.396484	979.173096
-        """
+        dedent(
+            """
+            #Wav3		#Intensity
+            3399.408203	1016.205444
+            3398.738281	1008.868225
+            3398.067383	1016.025818
+            3397.396484	979.173096
+            """
+        )
     )
     txt_data_extra_header = StringIO(
-        """
-        #Wave		#Intensity	#Intensity
-        3399.408203	1016.205444	-38.7
-        3398.738281	1008.868225	-38.7
-        3398.067383	1016.025818	-38.7
-        3397.396484	979.173096	-38.7
-        """
+        dedent(
+            """
+            #Wave		#Intensity	#Intensity
+            3399.408203	1016.205444	-38.7
+            3398.738281	1008.868225	-38.7
+            3398.067383	1016.025818	-38.7
+            3397.396484	979.173096	-38.7
+            """
+        )
     )
     with pytest.raises(KeyError):
         read_renishaw_singlepoint_txt(txt_data_botched_header)  # type: ignore

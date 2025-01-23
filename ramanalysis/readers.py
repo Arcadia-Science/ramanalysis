@@ -28,7 +28,7 @@ def read_openraman_csv(csv_filepath: Path | str) -> FloatArray:
     if not any(column.lower().startswith("intensity") for column in dataframe.columns):
         msg = (
             "Expected column 'Intensity' or 'Intensity (a. u.)', but received "
-            f"{dataframe.columns.tolist()} instead."
+            f"these columns instead: {dataframe.columns.tolist()}."
         )
         raise KeyError(msg)
 

@@ -24,18 +24,17 @@ def read_openraman_csv(csv_filepath: Path | str) -> FloatArray:
     """
     dataframe = pd.read_csv(csv_filepath)  # type: ignore
 
-    # check that file has expected column names
-    if not any(column.lower().startswith("intensity") for column in dataframe.columns):
-        msg = (
-            "Expected column 'Intensity' or 'Intensity (a. u.)', but received "
+    valid_intensity_column_names = {"Intensity", "Intensity (a.u.)"}
+    for column_name in dataframe.columns:
+        if column_name in valid_intensity_column_names:
+            intensity_column_name = column_name
+            break
+    else:
+        raise KeyError(
+            f"Expected one of {valid_intensity_column_names}, but received "
             f"these columns instead: {dataframe.columns.tolist()}."
         )
-        raise KeyError(msg)
 
-    # determine which column has intensity data
-    intensity_column_name = next(
-        name for name in dataframe.columns if name.lower().startswith("intensity")
-    )
     intensities = np.array(dataframe.loc[:, intensity_column_name].values).astype(np.float64)
     return intensities
 

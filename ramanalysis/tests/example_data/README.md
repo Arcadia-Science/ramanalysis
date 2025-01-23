@@ -34,7 +34,7 @@ This folder contains several sources of example Raman spectroscopy data useful f
 ─ synthetic_data
   ├── fake_spectrum_0.txt
   ├── ...
-  ├── fake_spectrum_9.txt
+  └── fake_spectrum_9.txt
 ```
 
 

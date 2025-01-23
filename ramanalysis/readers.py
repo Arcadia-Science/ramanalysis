@@ -34,7 +34,7 @@ def read_openraman_csv(csv_filepath: Path | str) -> FloatArray:
 
     # determine which column has intensity data
     intensity_column_index = next(
-        i for i, name in enumerate(dataframe.columns) if name.lower().startswith("intens")
+        i for i, name in enumerate(dataframe.columns) if name.lower().startswith("intensity")
     )
     intensities = np.array(dataframe.iloc[:, intensity_column_index].values).astype(np.float64)
     return intensities

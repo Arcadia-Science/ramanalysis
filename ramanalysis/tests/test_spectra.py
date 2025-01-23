@@ -26,17 +26,17 @@ def test_nonarraylike_input_fails():
     with pytest.raises(ValueError):
         RamanSpectrum(
             wavenumbers_cm1=32,  # type: ignore
-            intensities=[34],  # type: ignore
+            intensities=np.array([34.3]),
         )
     with pytest.raises(ValueError):
         RamanSpectrum(
-            wavenumbers_cm1=np.array([3]),
+            wavenumbers_cm1=np.array([3.0]),
             intensities=91,  # type: ignore
         )
     with pytest.raises(ValueError):
         RamanSpectrum(
             wavenumbers_cm1="0.54",  # type: ignore
-            intensities=[34],  # type: ignore
+            intensities=np.array([34.3]),
         )
 
 

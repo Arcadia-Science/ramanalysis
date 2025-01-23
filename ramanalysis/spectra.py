@@ -2,6 +2,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 from scipy.signal import find_peaks, medfilt
@@ -19,7 +20,7 @@ from .readers import (
     read_renishaw_singlepoint_txt,
     read_wasatch_csv,
 )
-from .typing import FloatArray
+from .typing import FloatArray, FloatOrArray
 
 logger = logging.getLogger(__name__)
 
@@ -157,8 +158,8 @@ class RamanSpectrum:
 
     def interpolate(
         self,
-        float_indices: float | FloatArray,
-    ) -> tuple[float, float] | tuple[FloatArray, FloatArray]:
+        float_indices: FloatOrArray,
+    ) -> tuple[FloatOrArray, FloatOrArray]:
         """One-dimensional linear interpolation.
 
         Examples:
@@ -181,7 +182,10 @@ class RamanSpectrum:
         interpolated_intensities = np.interp(
             float_indices, np.arange(self.intensities.size), self.intensities
         )
-        return interpolated_wavenumbers_cm1, interpolated_intensities
+        return (
+            cast(FloatOrArray, interpolated_wavenumbers_cm1),
+            cast(FloatOrArray, interpolated_intensities),
+        )
 
     def normalize(self) -> RamanSpectrum:
         """Scale intensities with min-max normalization."""

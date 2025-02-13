@@ -1,18 +1,17 @@
 # ramanalysis
 
-This repository contains a Python package called `ramanalysis`, the main purpose of which is to facilitate reading Raman spectroscopy data from a variety of instruments by unifying the way the spectral data is loaded.
-This package currently supports loading spectral data from two different Raman spectrometers:
+This repository contains a Python package called `ramanalysis`, the main purpose of which is to facilitate reading Raman spectroscopy data from a variety of instruments by unifying the way the spectral data is loaded. This package currently supports loading spectral data from four different Raman spectrometer manufacturers:
+- Horiba (tested on the [MacroRAM](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/macroramtm-805/) and [LabRAM HR Evolution](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/labram-hr-evolution-1083/))
 - [OpenRAMAN](https://www.open-raman.org/)
-- [Horiba MacroRam](https://www.horiba.com/usa/scientific/products/detail/action/show/Product/macroramtm-805/)
+- Renishaw (tested on the [inVia Qontor](https://www.renishaw.com/en/invia-confocal-raman-microscope--6260?srsltid=AfmBOopl_QZvOFjalleTRHwKhOeAd4n04PBzR-F76UfXmM1ld-RRMILm))
+- Wasatch (tested on the [WP785X](https://wasatchphotonics.com/product/wp-785x-raman-spectrometer-series/))
 
-The most useful thing this package does is facilitate the calibration of spectral data output by the OpenRAMAN. The calibration procedure consists of two steps:
+This package also facilitates the calibration of spectral data output by the OpenRAMAN. The calibration procedure consists of two steps:
 1. A rough calibration based on a broadband excitation light source (e.g. Neon lamp)
 2. A fine calibration based on Raman-scattered light from a standard sample
    (e.g. acetonitrile)
 
-Both calibration steps can be run automatically when spectra of neon and acetonitrile are provided (see [Usage](usage)).
-
-This automated procedure builds upon the [calibration procedure](https://github.com/Arcadia-Science/2024-open-raman-analysis/blob/calibration/notebooks/0_generate_calibration.ipynb) implemented by [@sunandascript](https://github.com/sunandascript). For more information on the calibration procedure, see this [blog post](https://www.open-raman.org/robust-calibration-method-for-spectrometers/) by the creator of the OpenRAMAN.
+Both calibration steps can be run automatically when spectra of neon and acetonitrile are provided (see [Usage](usage)). This automated procedure builds upon the [calibration procedure](https://github.com/Arcadia-Science/2024-open-raman-analysis/blob/calibration/notebooks/0_generate_calibration.ipynb) implemented by [@sunandascript](https://github.com/sunandascript). For more information on the calibration procedure, see this [blog post](https://www.open-raman.org/robust-calibration-method-for-spectrometers/) by the creator of the OpenRAMAN.
 
 
 ## Installation
@@ -24,11 +23,9 @@ The package is hosted on PyPI and can be installed using pip:
 pip install ramanalysis
 ``` -->
 
-Clone the repository and install via pip:
+The package can be installed directly from the GitHub repository via `pip`:
 ```bash
-git clone https://github.com/Arcadia-Science/ramanalysis.git
-cd ramanalysis
-pip install -e .
+pip install git+https://github.com/Arcadia-Science/ramanalysis.git
 ```
 
 
@@ -40,7 +37,7 @@ from pathlib import Path
 from ramanalysis import RamanSpectrum
 
 # Set file paths to the CSV files for your sample and calibration data
-example_data_directory = Path("ramanalysis/ramanalysis/tests/example_data/OpenRAMAN/")
+example_data_directory = Path("./ramanalysis/tests/example_data/OpenRAMAN/")
 csv_filepath_sample = next(example_data_directory.glob("*CC-125*.csv"))
 csv_filepath_excitation_calibration = next(example_data_directory.glob("*neon*.csv"))
 csv_filepath_emission_calibration = next(example_data_directory.glob("*aceto*.csv"))

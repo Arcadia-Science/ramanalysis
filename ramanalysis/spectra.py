@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import cast
 
 import numpy as np
+import pandas as pd
 from scipy.signal import find_peaks, medfilt
 
 from .calibrate import (
@@ -137,6 +138,18 @@ class RamanSpectrum:
         """Load a Raman spectrum from a CSV file output by the Wasatch WP 785X."""
         wavenumbers_cm1, intensities, _metadata = read_wasatch_csv(csv_filepath)
         return RamanSpectrum(wavenumbers_cm1, intensities)
+
+    @classmethod
+    def from_generic_csvfile(
+        cls,
+        csv_filepath: Path | str,
+        wavenumber_cm1_index: int = 0,
+        intensity_index: int = 1,
+        **kwargs,
+    ) -> RamanSpectrum:
+        """"""
+        data = pd.read_csv(csv_filepath, **kwargs).values  # type: ignore
+        return RamanSpectrum(wavenumbers_cm1=data[:, 0], intensities=data[:, 1])
 
     @property
     def snr(self) -> float:

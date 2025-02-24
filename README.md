@@ -37,7 +37,7 @@ from pathlib import Path
 from ramanalysis import RamanSpectrum
 
 # Set file paths to the CSV files for your sample and calibration data
-example_data_directory = Path("ramanalysis/ramanalysis/tests/example_data/OpenRAMAN/")
+example_data_directory = Path("./ramanalysis/tests/example_data/OpenRAMAN/")
 csv_filepath_sample = next(example_data_directory.glob("*CC-125*.csv"))
 csv_filepath_excitation_calibration = next(example_data_directory.glob("*neon*.csv"))
 csv_filepath_emission_calibration = next(example_data_directory.glob("*aceto*.csv"))

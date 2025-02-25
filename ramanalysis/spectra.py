@@ -147,9 +147,21 @@ class RamanSpectrum:
         intensity_index: int = 1,
         **kwargs,
     ) -> RamanSpectrum:
-        """"""
+        """Load a Raman spectrum from a CSV file for which there is no pre-defined reader.
+
+        Most data files from Raman spectrometer manufacturers follow a convention where the first
+        column contains the wavenumbers and the second column contains the intensities. Where
+        they vary is in e.g. the delimiter character, the number of rows of metadata, etc. This
+        function assumes this generic format and creates a spectrum object from the data by passing
+        keyword arguments to :func:`pd.read_csv` to support a range of possible formats.
+
+        See also:
+            - https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html
+        """
         data = pd.read_csv(csv_filepath, **kwargs).values  # type: ignore
-        return RamanSpectrum(wavenumbers_cm1=data[:, 0], intensities=data[:, 1])
+        wavenumbers_cm1 = data[:, wavenumber_cm1_index]
+        intensities = data[:, intensity_index]
+        return RamanSpectrum(wavenumbers_cm1, intensities)
 
     @property
     def snr(self) -> float:

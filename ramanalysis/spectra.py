@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import cast
 
 import numpy as np
+import pandas as pd
 from scipy.signal import find_peaks, medfilt
 
 from .calibrate import (
@@ -136,6 +137,30 @@ class RamanSpectrum:
     def from_wasatch_csvfile(cls, csv_filepath: Path | str) -> RamanSpectrum:
         """Load a Raman spectrum from a CSV file output by the Wasatch WP 785X."""
         wavenumbers_cm1, intensities, _metadata = read_wasatch_csv(csv_filepath)
+        return RamanSpectrum(wavenumbers_cm1, intensities)
+
+    @classmethod
+    def from_generic_csvfile(
+        cls,
+        csv_filepath: Path | str,
+        wavenumber_cm1_index: int = 0,
+        intensity_index: int = 1,
+        **kwargs,
+    ) -> RamanSpectrum:
+        """Load a Raman spectrum from a CSV file for which there is no pre-defined reader.
+
+        Most data files from Raman spectrometer manufacturers follow a convention where the first
+        column contains the wavenumbers and the second column contains the intensities. Where
+        they vary is in e.g. the delimiter character, the number of rows of metadata, etc. This
+        function assumes this generic format and creates a spectrum object from the data by passing
+        keyword arguments to :func:`pd.read_csv` to support a range of possible formats.
+
+        See also:
+            - https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html
+        """
+        data = pd.read_csv(csv_filepath, **kwargs).values  # type: ignore
+        wavenumbers_cm1 = data[:, wavenumber_cm1_index]
+        intensities = data[:, intensity_index]
         return RamanSpectrum(wavenumbers_cm1, intensities)
 
     @property

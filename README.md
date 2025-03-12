@@ -11,7 +11,10 @@ This package also facilitates the calibration of spectral data output by the Ope
 2. A fine calibration based on Raman-scattered light from a standard sample
    (e.g. acetonitrile)
 
-Both calibration steps can be run automatically when spectra of neon and acetonitrile are provided (see [Usage](usage)). This automated procedure builds upon the [calibration procedure](https://github.com/Arcadia-Science/2024-open-raman-analysis/blob/calibration/notebooks/0_generate_calibration.ipynb) implemented by [@sunandascript](https://github.com/sunandascript). For more information on the calibration procedure, see this [blog post](https://www.open-raman.org/robust-calibration-method-for-spectrometers/) by the creator of the OpenRAMAN.
+Both calibration steps can be run automatically when spectra of neon and acetonitrile are provided (see [Usage](usage)). This automated procedure builds upon the [calibration protocol](https://dx.doi.org/10.17504/protocols.io.yxmvmemj6g3p/v1) created by Sunanda Sharma and Ben Braverman. 
+The pub associated with this protocol can be [here](https://doi.org/10.57844/arcadia-cd7e-443b).
+
+For more information on the calibration procedure, see this [blog post](https://www.open-raman.org/robust-calibration-method-for-spectrometers/) by the creator of the OpenRAMAN.
 
 
 ## Installation
@@ -51,6 +54,10 @@ spectrum = RamanSpectrum.from_openraman_csvfiles(
 ```
 
 See [examples](docs/examples/) for more example usage.
+
+## Cited by
+
+Essock-Burns T, Kolb I, Lane R, Mets DG, Sharma S. (2025). "Comparison of spontaneous Raman spectrometers." https://arcadia-science.github.io/2025-raman-spectrometer-comparison/
 
 
 ## Roadmap

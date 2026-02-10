@@ -73,7 +73,7 @@ sphinx-autoapi = "3.1.2"
 sphinx-tabs = "3.4.5"
 nbsphinx = "0.9.5"
 # Jupyterlab and matplotlib are needed for notebook rendering.
-jupyterlab = "4.2.5"
+jupyterlab = "4.4.8"
 matplotlib = "3.9.2"
 tornado = "^6.4.2"
 
